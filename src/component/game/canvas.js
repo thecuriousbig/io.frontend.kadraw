@@ -3,6 +3,7 @@ import React, { Component } from "react";
 class Canvas extends Component {
   constructor(props) {
     super(props);
+    this.state = { strokeStyle: "#000000", lineWidth: 1, lineCap: "round" };
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.endPaintEvent = this.endPaintEvent.bind(this);
@@ -10,12 +11,11 @@ class Canvas extends Component {
 
   isPainting = false;
 
-  userStrokeStyle = "#000000";
+  // userStrokeStyle = "#000000";
 
   line = [];
 
   prevPos = { offsetX: 0, offsetY: 0 };
-
   onMouseDown({ nativeEvent }) {
     const { offsetX, offsetY } = nativeEvent;
     this.isPainting = true;
@@ -31,7 +31,7 @@ class Canvas extends Component {
       };
 
       this.line = this.line.concat(positionData);
-      this.paint(this.prevPos, offSetData, this.userStrokeStyle);
+      this.paint(this.prevPos, offSetData, this.state.strokeStyle);
     }
   }
   endPaintEvent() {
@@ -54,15 +54,37 @@ class Canvas extends Component {
     this.ctx.stroke();
     this.prevPos = { offsetX, offsetY };
   }
+  clearCanvas() {
+    this.ctx = this.canvas.getContext("2d");
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
   componentDidMount() {
     this.canvas.width = 1000;
     this.canvas.height = 800;
     this.ctx = this.canvas.getContext("2d");
     this.ctx.lineJoin = "round";
-    this.ctx.lineCap = "round";
-    this.ctx.lineWidth = 5;
+    this.ctx.lineCap = this.state.lineCap;
+    this.ctx.lineWidth = this.state.lineWidth;
   }
-
+  static getDerivedStateFromProps(props, state) {
+    const newBrushOptions = {
+      strokeStyle: props.brushOptions.color,
+      lineWidth: props.brushOptions.size,
+      lineCap: props.brushOptions.cap
+    };
+    if (state !== newBrushOptions) {
+      return {
+        ...newBrushOptions
+      };
+    }
+    return null;
+  }
+  componentDidUpdate(prevProps) {
+    this.ctx = this.canvas.getContext("2d");
+    this.ctx.lineJoin = "round";
+    this.ctx.lineCap = this.state.lineCap;
+    this.ctx.lineWidth = this.state.lineWidth;
+  }
   render() {
     return (
       <canvas
