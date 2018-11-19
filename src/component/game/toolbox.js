@@ -16,6 +16,10 @@ class Game extends Component {
   handleClickSize(size) {
     this.props.changeBrushSize(size);
   }
+  handleClickEraser() {
+    this.props.changeBrushColor("#FFFFFF");
+    this.props.changeBrushCap("round");
+  }
   handleClickClear() {
     this.props.handleClearCanvas();
   }
@@ -37,12 +41,15 @@ class Game extends Component {
         </button>
       </div>
     ));
+    var eraser_button = (
+      <button onClick={this.handleClickEraser.bind(this)}>Eraser</button>
+    );
     var reset_button = (
       <button onClick={this.handleClickClear.bind(this)}>Clear</button>
     );
     return (
       <div>
-        {color_button} {size_button} {reset_button}
+        {color_button} {size_button} {reset_button} {eraser_button}
       </div>
     );
   }

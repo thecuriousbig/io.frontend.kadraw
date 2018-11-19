@@ -40,25 +40,25 @@ class Game extends Component {
       };
     });
   }
+  changeBrushCap(cap) {
+    this.setState(state => {
+      return {
+        ...state,
+        drawer: { ...state.drawer, brush: { ...state.drawer.brush, cap } }
+      };
+    });
+  }
   handleClearCanvas() {
     if (this.canvas) {
       this.canvas.clearCanvas();
     }
   }
+
   render() {
-    return (
-      <div>
-        <Canvas
-          ref={ref => (this.canvas = ref)}
-          brushOptions={this.state.drawer.brush}
-        />
-        <Toolbox
-          changeBrushColor={this.changeBrushColor.bind(this)}
-          changeBrushSize={this.changeBrushSize.bind(this)}
-          handleClearCanvas={this.handleClearCanvas.bind(this)}
-        />
-      </div>
-    );
+    return <div>
+        <Canvas ref={ref => (this.canvas = ref)} brushOptions={this.state.drawer.brush} />
+      <Toolbox changeBrushColor={this.changeBrushColor.bind(this)} changeBrushSize={this.changeBrushSize.bind(this)} changeBrushCap={this.changeBrushCap.bind(this)} handleClearCanvas={this.handleClearCanvas.bind(this)} />
+      </div>;
   }
 }
 
