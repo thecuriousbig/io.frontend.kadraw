@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import firebase from './../config/firebase'
 import chance from 'chance'
 
-import { Grid, Segment, Divider, Input, Button, Image, Header } from 'semantic-ui-react'
+import { Grid, Segment, Divider, Input, Button, Image, Header, Modal, Dropdown } from 'semantic-ui-react'
 
 class Login extends Component {
 	constructor(props) {
@@ -14,21 +14,26 @@ class Login extends Component {
 			roomId: '',
 			score: 0,
 			avatarId: 0,
+			modal: false,
+			dropdownValue: 5,
 			imageUrl: 'https://picsum.photos/160'
 		}
 	}
 
-	handleChange = event => {
+	handleChange = (event, data) => {
 		if (event.target.name === 'name') {
 			this.setState({ name: event.target.value })
 		} else if (event.target.name === 'roomId') {
 			this.setState({ roomId: event.target.value })
+		} else {
+			this.setState({ dropdownValue: data.value })
 		}
 	}
 
 	generatePin = () => {
 		// Implement checking pin if I have time
-		return chance.Chance().integer({ min: 100000, max: 999999 })
+		const pin = chance.Chance().integer({ min: 100000, max: 999999 })
+		return pin.toString()
 	}
 
 	joinRoom = async () => {
@@ -36,8 +41,7 @@ class Login extends Component {
 			name: this.state.name,
 			roomId: this.state.roomId,
 			score: this.state.score,
-			avatarId: this.state.avatarId,
-			role: 'member'
+			avatarId: this.state.avatarId
 		}
 
 		await this.userRef
@@ -52,29 +56,58 @@ class Login extends Component {
 		console.log('join room')
 	}
 
+	showModal = () => this.setState({ modal: true })
+
+	closeModal = () => this.setState({ modal: false })
+
 	createRoom = async () => {
 		const user = {
 			name: this.state.name,
 			roomId: this.generatePin(),
 			score: this.state.score,
-			avartarId: this.state.avatarId,
-			role: 'Leader' // Room Creator
+			avartarId: this.state.avatarId
 		}
+
+		const room = {
+			users: [],
+			setting: {
+				numberOfPlayer: this.state.dropdownValue,
+				numberOfRound: 5
+			}
+		}
+		console.log('numberOfPlayer: ', room.setting.numberOfPlayer)
 
 		await this.userRef
 			.add(user)
 			.then(doc => {
-				// create a room [pin] in firestore and add this user to room
-				console.log('doc : ', doc.get())
+				room.users.push({ id: doc.id, role: 'Leader' })
+				console.log(`add user [${doc.id}] complete`)
 			})
-			.catch(err => {
-				console.log('err : ', err)
-			})
+			.catch(err => console.log('err ', err))
 
-		console.log('create room ')
+		await this.roomRef
+			.doc(user.roomId)
+			.set(room)
+			.then(roomDoc => {
+				console.log(`create room success`)
+			})
+			.catch(err => console.log('err ', err))
+
+		this.closeModal()
 	}
 
 	render() {
+		const options = [
+			{ key: 2, text: '2', value: 2 },
+			{ key: 3, text: '3', value: 3 },
+			{ key: 4, text: '4', value: 4 },
+			{ key: 5, text: '5', value: 5 },
+			{ key: 6, text: '6', value: 6 },
+			{ key: 7, text: '7', value: 7 },
+			{ key: 8, text: '8', value: 8 },
+			{ key: 9, text: '9', value: 9 },
+			{ key: 10, text: '10', value: 10 }
+		]
 		return (
 			<div className="login-form">
 				<style>{`
@@ -110,10 +143,35 @@ class Login extends Component {
 								action={{ content: 'submit', onClick: this.joinRoom }}
 							/>
 							<Divider horizontal>Or</Divider>
-							<Button fluid content="Create Room" onClick={this.createRoom} />
+							<Button fluid content="Create Room" onClick={this.showModal} />
 						</Segment>
 					</Grid.Column>
 				</Grid>
+
+				<Modal
+					size="mini"
+					dimmer="blurring"
+					open={this.state.modal}
+					onClose={this.closeModal}
+					style={{ height: '30%' }}
+				>
+					<Modal.Header>Room Setting</Modal.Header>
+					<Modal.Content>
+						<h4>Number of Player</h4>
+						<Dropdown
+							placeholder="number of player"
+							fluid
+							selection
+							value={this.state.dropdownValue}
+							options={options}
+							name="dropdown"
+							onChange={this.handleChange}
+						/>
+					</Modal.Content>
+					<Modal.Actions>
+						<Button primary icon="checkmark" labelPosition="right" content="Next" onClick={this.createRoom} />
+					</Modal.Actions>
+				</Modal>
 			</div>
 		)
 	}
