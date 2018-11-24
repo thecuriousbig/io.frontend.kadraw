@@ -33,10 +33,40 @@ class Home extends Component {
 		}
 	}
 
-	generatePin = () => {
+	getExcludeRandom = excludeArray => {
+		let num = 0
+		let match = false
+		do {
+			num = chance.Chance().integer({ min: 100000, max: 999999 })
+			excludeArray.forEach(i => {
+				if (i === num) {
+					match = true
+				}
+			})
+		} while (match)
+		return num.toString()
+	}
+
+	generatePin = async () => {
 		// Implement checking pin if I have time
-		const pin = chance.Chance().integer({ min: 100000, max: 999999 })
-		return pin.toString()
+		let pin = chance
+			.Chance()
+			.integer({ min: 100000, max: 999999 })
+			.toString()
+		await this.lobbyRef.get().then(querySnapshot => {
+			let excludeArray = []
+			let isMatch = false
+			querySnapshot.forEach(docs => {
+				if (pin === docs.id) {
+					isMatch = true
+				}
+				excludeArray.push(parseInt(docs.id, 10))
+			})
+			if (isMatch) {
+				pin = this.getExcludeRandom(excludeArray)
+			}
+		})
+		return pin
 	}
 
 	joinLobby = async () => {
@@ -64,11 +94,9 @@ class Home extends Component {
 					numberOfPlayer = snapshot.data().setting.numberOfPlayer
 					playerInLobby = snapshot.data().users.length
 					isFull = playerInLobby < numberOfPlayer ? false : true
-					console.log(playerInLobby)
 					if (isFull) {
 						this.setState({ haveError: true, error: 'lobby is full' })
 					}
-					console.log(isFull)
 				},
 				err => {
 					console.log('err : ', err)
@@ -100,7 +128,7 @@ class Home extends Component {
 	createLobby = async () => {
 		const user = {
 			name: this.state.name,
-			lobbyId: this.generatePin(),
+			lobbyId: await this.generatePin(),
 			score: this.state.score,
 			avartarId: this.state.avatarId
 		}
