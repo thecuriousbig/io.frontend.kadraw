@@ -3,16 +3,18 @@ import firebase from '../config/firebase'
 import chance from 'chance'
 import { withRouter } from 'react-router-dom'
 
-import { Grid, Segment, Divider, Input, Button, Image, Header, Modal, Dropdown } from 'semantic-ui-react'
+import { Grid, Segment, Divider, Input, Button, Image, Header, Modal, Dropdown, Message } from 'semantic-ui-react'
 
 class Home extends Component {
 	constructor(props) {
 		super(props)
 		this.userRef = firebase.firestore().collection('User')
-		this.roomRef = firebase.firestore().collection('Rooms')
+		this.lobbyRef = firebase.firestore().collection('Lobby')
 		this.state = {
 			name: '',
-			roomId: '',
+			lobbyId: '',
+			haveError: false,
+			error: '',
 			score: 0,
 			avatarId: 0,
 			modal: false,
@@ -24,8 +26,8 @@ class Home extends Component {
 	handleChange = (event, data) => {
 		if (event.target.name === 'name') {
 			this.setState({ name: event.target.value })
-		} else if (event.target.name === 'roomId') {
-			this.setState({ roomId: event.target.value })
+		} else if (event.target.name === 'lobbyId') {
+			this.setState({ lobbyId: event.target.value })
 		} else {
 			this.setState({ dropdownValue: data.value })
 		}
@@ -37,65 +39,98 @@ class Home extends Component {
 		return pin.toString()
 	}
 
-	joinRoom = async () => {
+	joinLobby = async () => {
 		const user = {
 			name: this.state.name,
-			roomId: this.state.roomId,
+			lobbyId: this.state.lobbyId.toString(),
 			score: this.state.score,
 			avatarId: this.state.avatarId
 		}
 
-		await this.userRef
-			.add(user)
-			.then(doc => {
-				console.log('doc :', doc)
-			})
-			.catch(err => {
-				console.log('err : ', err)
-			})
+		let isExist = true
+		let numberOfPlayer, playerInLobby, isFull
+		this.setState({ haveError: false })
 
-		console.log('join room')
+		await this.lobbyRef
+			.doc(user.lobbyId)
+			.get()
+			.then(
+				snapshot => {
+					if (snapshot.exists === false) {
+						// if document does not exist
+						isExist = false
+						return this.setState({ haveError: true, error: 'lobby not found' })
+					}
+					numberOfPlayer = snapshot.data().setting.numberOfPlayer
+					playerInLobby = snapshot.data().users.length
+					isFull = playerInLobby < numberOfPlayer ? false : true
+					console.log(playerInLobby)
+					if (isFull) {
+						this.setState({ haveError: true, error: 'lobby is full' })
+					}
+					console.log(isFull)
+				},
+				err => {
+					console.log('err : ', err)
+				}
+			)
+
+		if (isExist && !isFull) {
+			await this.userRef.add(user).then(
+				doc => {
+					this.lobbyRef
+						.doc(user.lobbyId)
+						.update({
+							users: firebase.firestore.FieldValue.arrayUnion({ id: doc.id, role: 'Member' })
+						})
+						.then(() => console.log('add player to lobby complete'), err => console.log('err ', err))
+				},
+				err => {
+					console.log('err ', err)
+				}
+			)
+			this.props.history.push(`/lobby/${user.lobbyId}`)
+		}
 	}
 
 	showModal = () => this.setState({ modal: true })
 
 	closeModal = () => this.setState({ modal: false })
 
-	createRoom = async () => {
+	createLobby = async () => {
 		const user = {
 			name: this.state.name,
-			roomId: this.generatePin(),
+			lobbyId: this.generatePin(),
 			score: this.state.score,
 			avartarId: this.state.avatarId
 		}
 
-		const room = {
+		const lobby = {
 			users: [],
 			setting: {
 				numberOfPlayer: this.state.dropdownValue,
 				numberOfRound: 5
 			}
 		}
-		console.log('numberOfPlayer: ', room.setting.numberOfPlayer)
 
 		await this.userRef
 			.add(user)
 			.then(doc => {
-				room.users.push({ id: doc.id, role: 'Leader' })
+				lobby.users.push({ id: doc.id, role: 'Leader' })
 				console.log(`add user [${doc.id}] complete`)
 			})
 			.catch(err => console.log('err ', err))
 
-		await this.roomRef
-			.doc(user.roomId)
-			.set(room)
-			.then(roomDoc => {
-				console.log(`create room success`)
+		await this.lobbyRef
+			.doc(user.lobbyId)
+			.set(lobby)
+			.then(() => {
+				console.log(`create lobby success`)
 			})
 			.catch(err => console.log('err ', err))
 
 		this.closeModal()
-		this.props.history.push(`/lobby/${user.roomId}`)
+		this.props.history.push(`/lobby/${user.lobbyId}`)
 	}
 
 	render() {
@@ -110,6 +145,9 @@ class Home extends Component {
 			{ key: 9, text: '9', value: 9 },
 			{ key: 10, text: '10', value: 10 }
 		]
+
+		const { haveError, error } = this.state
+
 		return (
 			<div className="login-form">
 				<style>{`
@@ -132,20 +170,21 @@ class Home extends Component {
 								<Button circular size="mini" icon="arrow right" />
 							</Grid>
 
-							<h3>Your Name</h3>
+							<h3 style={{ textAlign: 'left' }}>Your Name</h3>
 							<Input fluid placeholder="Guest" name="name" value={this.state.name} onChange={this.handleChange} />
-							<h3>Join Room</h3>
+							<h3 style={{ textAlign: 'left' }}>Join Room</h3>
 							<Input
 								fluid
 								type="number"
 								placeholder="12 34 56"
-								name="roomId"
-								value={this.state.roomId}
+								name="lobbyId"
+								value={this.state.lobbyId}
 								onChange={this.handleChange}
-								action={{ content: 'submit', onClick: this.joinRoom }}
+								action={{ content: 'Join', onClick: this.joinLobby }}
 							/>
+							{haveError ? <Message error header="Action Forbidden" content={error} /> : ''}
 							<Divider horizontal>Or</Divider>
-							<Button fluid content="Create Room" onClick={this.showModal} />
+							<Button fluid content="Create Lobby" onClick={this.showModal} />
 						</Segment>
 					</Grid.Column>
 				</Grid>
@@ -157,7 +196,7 @@ class Home extends Component {
 					onClose={this.closeModal}
 					style={{ height: '30%' }}
 				>
-					<Modal.Header>Room Setting</Modal.Header>
+					<Modal.Header>Lobby Setting</Modal.Header>
 					<Modal.Content>
 						<h4>Number of Player</h4>
 						<Dropdown
@@ -171,7 +210,7 @@ class Home extends Component {
 						/>
 					</Modal.Content>
 					<Modal.Actions>
-						<Button primary icon="checkmark" labelPosition="right" content="Next" onClick={this.createRoom} />
+						<Button primary icon="checkmark" labelPosition="right" content="Next" onClick={this.createLobby} />
 					</Modal.Actions>
 				</Modal>
 			</div>
@@ -180,27 +219,3 @@ class Home extends Component {
 }
 
 export default withRouter(Home)
-
-/* <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle'>
-					<Grid.Row centered columns={16} color="green">
-						<Grid.Column width={8}>
-						<Header textAlign="center" style={{ fontSize: '50px', fontFamily: 'Roboto' }}>
-								Kadraw.io
-						</Header>
-							<Segment clearing padded="very">
-								<Grid columns={3} centered>
-									<Button circular size="mini" icon="arrow left" />
-									<Image src={this.state.imageUrl} circular />
-									<Button circular size="mini" icon="arrow right" />
-								</Grid>
-								<h3>Your Name</h3>
-								<Input fluid placeholder="Guest" name="name" value={this.state.name} onChange={this.handleChange} />
-								<h3>Join Room</h3>
-								<Input fluid type="number" placeholder="12 34 56" name="roomId" value={this.state.roomId} onChange={this.handleChange} action={{content: 'submit', onClick: this.joinRoom}}/>
-								<Divider horizontal>Or</Divider>
-								<Button fluid content="Create Room" onClick={this.createRoom} />
-							</Segment>
-						</Grid.Column>
-					</Grid.Row>
-					<Grid.Row style={{ height: '15%' }} />
-				</Grid> */
