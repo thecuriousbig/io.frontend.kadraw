@@ -10,6 +10,8 @@ class Home extends Component {
 		super(props)
 		this.userRef = firebase.firestore().collection('User')
 		this.lobbyRef = firebase.firestore().collection('Lobby')
+		this.avatarRef = firebase.firestore().collection('Asset')
+
 		this.state = {
 			name: '',
 			lobbyId: '',
@@ -19,8 +21,20 @@ class Home extends Component {
 			avatarId: 0,
 			modal: false,
 			dropdownValue: 5,
-			imageUrl: 'https://picsum.photos/160'
+			avatar: []
 		}
+	}
+
+	async componentDidMount() {
+		await this.avatarRef
+			.doc('avatar')
+			.get()
+			.then(docs => {
+				this.setState({ avatar: docs.data().url })
+			})
+			.catch(err => console.log('err : ', err))
+
+		console.log(this.state.avatar)
 	}
 
 	handleChange = (event, data) => {
@@ -74,7 +88,7 @@ class Home extends Component {
 			name: this.state.name,
 			lobbyId: this.state.lobbyId.toString(),
 			score: this.state.score,
-			avatarId: this.state.avatarId
+			avatar: this.state.avatar[this.state.avatarId]
 		}
 
 		let isExist = true
@@ -130,7 +144,7 @@ class Home extends Component {
 			name: this.state.name,
 			lobbyId: await this.generatePin(),
 			score: this.state.score,
-			avartarId: this.state.avatarId
+			avatar: this.state.avatar[this.state.avatarId]
 		}
 
 		const lobby = {
@@ -159,6 +173,23 @@ class Home extends Component {
 
 		this.closeModal()
 		this.props.history.push(`/lobby/${user.lobbyId}`)
+	}
+
+	changeAvatar = event => {
+		const current = this.state.avatarId
+		if (event.target.name === 'left') {
+			if (this.state.avatarId === 0) {
+				this.setState({ avatarId: 53 })
+			} else {
+				this.setState({ avatarId: current - 1 })
+			}
+		} else {
+			if (this.state.avatarId === 53) {
+				this.setState({ avatarId: 0 })
+			} else {
+				this.setState({ avatarId: current + 1 })
+			}
+		}
 	}
 
 	render() {
@@ -193,9 +224,9 @@ class Home extends Component {
 
 						<Segment clearing padded="very">
 							<Grid columns={3} centered>
-								<Button circular size="mini" icon="arrow left" />
-								<Image src={this.state.imageUrl} circular />
-								<Button circular size="mini" icon="arrow right" />
+								<Button circular size="mini" icon="arrow left" name="left" onClick={this.changeAvatar} />
+								<Image src={this.state.avatar[this.state.avatarId]} circular style={{ width: '50%', height: '50%' }} bordered />
+								<Button circular size="mini" icon="arrow right" name="right" onClick={this.changeAvatar} />
 							</Grid>
 
 							<h3 style={{ textAlign: 'left' }}>Your Name</h3>
