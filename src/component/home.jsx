@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import firebase from './../config/firebase'
+import firebase from '../config/firebase'
 import chance from 'chance'
+import { withRouter } from 'react-router-dom'
 
 import { Grid, Segment, Divider, Input, Button, Image, Header, Modal, Dropdown } from 'semantic-ui-react'
 
-class Login extends Component {
+class Home extends Component {
 	constructor(props) {
 		super(props)
 		this.userRef = firebase.firestore().collection('User')
@@ -94,6 +95,7 @@ class Login extends Component {
 			.catch(err => console.log('err ', err))
 
 		this.closeModal()
+		this.props.history.push(`/lobby/${user.roomId}`)
 	}
 
 	render() {
@@ -177,7 +179,7 @@ class Login extends Component {
 	}
 }
 
-export default Login
+export default withRouter(Home)
 
 /* <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle'>
 					<Grid.Row centered columns={16} color="green">
