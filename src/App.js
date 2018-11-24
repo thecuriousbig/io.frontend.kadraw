@@ -1,10 +1,16 @@
 import React, { Component } from 'react'
-// import { Route } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 
-import Login from './component/login'
+import Home from './component/home'
+import Lobby from './component/lobby'
 class App extends Component {
 	render() {
-		return <Login />
+		return (
+			<div className="App">
+				<Route exact path="/" component={Home} />
+				<Route exact path="/lobby/:lobbyId" component={Lobby} />
+			</div>
+		)
 	}
 }
 
