@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import UserTab from "./Room/usertab.js";
-import firebase from "./firebase/firebase";
+import firebase from "../config/firebase";
 
-class Room extends Component {
+class Lobby extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,29 +15,24 @@ class Room extends Component {
       }
     };
   }
-  async getRoomInfo(roomId) {
+  async getRoomInfo(lobbyId) {
     const db = firebase.firestore();
-    db.settings({
-      timestampsInSnapshots: true
-    });
-    const userRef = db.collection("Lobby");
-    const exampleRoomRef = userRef.doc(roomId);
+    const lobbyRef = db.collection("Lobby");
+    const exampleRoomRef = lobbyRef.doc(lobbyId);
     const getDoc = await exampleRoomRef
       .get()
       .then(doc => {
         if (!doc.exists) {
           console.log("No such document!");
         } else {
-          console.log("Document data:");
-          console.log(doc.data());
-          const { numberOfPlayer, numberOfRound } = doc.data().setting;
-          const roomInfo = {
-            users: doc.data().users,
-            setting: {
-              numberOfPlayer,
-              numberOfRound
-            }
-          };
+          // const { numberOfPlayer, numberOfRound } = doc.data().setting;
+          // const roomInfo = {
+          //   users: doc.data().users,
+          //   setting: {
+          //     numberOfPlayer,
+          //     numberOfRound
+          //   }
+          // };
           this.setState({ room: doc.data() });
         }
       })
@@ -46,7 +41,7 @@ class Room extends Component {
       });
   }
   componentDidMount() {
-    this.getRoomInfo(this.props.match.params.roomId);
+    this.getRoomInfo(this.props.match.params.lobbyId);
   }
   render() {
     const users = this.state.room.users;
@@ -55,13 +50,14 @@ class Room extends Component {
 
     return (
       <div>
-        <h1>Room bitch</h1>
-        <UserTab users={users} />
+        <h1>Lobby bitch</h1>
         Player : {users.length} / {numberOfPlayer}
+        <br />
         Round : {numberOfRound}
+        <UserTab users={users} />
       </div>
     );
   }
 }
 
-export default Room;
+export default Lobby;
