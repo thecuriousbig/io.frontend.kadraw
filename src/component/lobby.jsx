@@ -14,43 +14,40 @@ class Lobby extends Component {
         }
       }
     };
+    this.db = firebase.firestore();
+    this.lobbyRef = this.db.collection("Lobby");
+    this.lobbyId = null;
+
   }
+
   async getRoomInfo(lobbyId) {
-    const db = firebase.firestore();
-    const lobbyRef = db.collection("Lobby");
-    const exampleRoomRef = lobbyRef.doc(lobbyId);
-    const getDoc = await exampleRoomRef
-      .get()
-      .then(doc => {
-        if (!doc.exists) {
+    const getDoc = await this.lobbyRef.doc(lobbyId)
+      .onSnapshot(function (snapshot) {
+        if (!snapshot.exists) {
           console.log("No such document!");
         } else {
-          // const { numberOfPlayer, numberOfRound } = doc.data().setting;
-          // const roomInfo = {
-          //   users: doc.data().users,
-          //   setting: {
-          //     numberOfPlayer,
-          //     numberOfRound
-          //   }
-          // };
-          this.setState({ room: doc.data() });
+          this.lobbyId = lobbyId;
+          this.setState({ room: snapshot.data() });
         }
+      }.bind(this), function (error) {
+        console.log("Error getting room", error);
       })
-      .catch(err => {
-        console.log("Error getting document", err);
-      });
   }
   componentDidMount() {
     this.getRoomInfo(this.props.match.params.lobbyId);
+  }
+  componentWillUnmount() {
+    const unsubscirbe = this.lobbyRef.onSnapshot(function () { });
+    unsubscirbe();
   }
   render() {
     const users = this.state.room.users;
     const setting = this.state.room.setting;
     const { numberOfPlayer, numberOfRound } = setting;
-
     return (
       <div>
         <h1>Lobby bitch</h1>
+        <h3>ID : {this.lobbyId}</h3>
         Player : {users.length} / {numberOfPlayer}
         <br />
         Round : {numberOfRound}
