@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import UserTab from "./Room/usertab.js";
+import UserTab from "./Room/usertab.jsx";
 import firebase from "../config/firebase";
 
 class Lobby extends Component {
