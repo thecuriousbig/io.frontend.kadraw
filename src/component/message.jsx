@@ -9,10 +9,10 @@ class Message extends Component {
 	render() {
 		return (
 			<Comment.Group>
-				<Comment>
+				<Comment style={{ textAlign: 'left' }}>
 					<Comment.Avatar src={this.props.message.avatar} />
 					<Comment.Content>
-						<Comment.Author>{this.props.message.author}</Comment.Author>
+						<Comment.Author style={{ color: 'blue' }}>{this.props.message.author}</Comment.Author>
 						<Comment.Text>{this.props.message.message}</Comment.Text>
 					</Comment.Content>
 				</Comment>

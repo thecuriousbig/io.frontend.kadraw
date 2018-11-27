@@ -3,7 +3,7 @@ import firebase from './../config/firebase'
 
 import Message from './message'
 
-import { Grid, Header, Segment, Input, Button } from 'semantic-ui-react'
+import { Grid, Header, Segment, Input, Button, Icon } from 'semantic-ui-react'
 
 class Chat extends Component {
 	constructor(props) {
@@ -41,19 +41,19 @@ class Chat extends Component {
 	}
 
 	async componentDidMount() {
-		await this.messageRef.limitToLast(10).on('value', message => {
-			if (message !== null) this.setState({ list: Object.values(message.val()) })
+		await this.messageRef.limitToLast(20).on('value', message => {
+			if (message.val() !== null) this.setState({ list: Object.values(message.val()) })
 		})
 	}
 
 	render() {
 		return (
-			<Grid style={{ height: '100%' }}>
-				<Grid.Column style={{ maxWidth: 650 }}>
+			<Grid>
+				<Grid.Column style={{ maxWidth: '600px', padding: '0 2px' }}>
 					<Header as="h1" textAlign="center">
 						Chat
 					</Header>
-					<Segment>
+					<Segment style={{ maxHeight: '300px', overflow: 'auto' }}>
 						{this.state.list.map((message, index) => (
 							<Message key={index} message={message} />
 						))}
@@ -65,8 +65,8 @@ class Chat extends Component {
 						value={this.state.message}
 						onChange={this.handleChange}
 						onKeyPress={this.handleKeyPress}
+						action={{ icon: 'paper plane', onClick: this.sendMessage }}
 					/>
-					<Button content="Create Lobby" onClick={this.sendMessage} />
 				</Grid.Column>
 			</Grid>
 		)
