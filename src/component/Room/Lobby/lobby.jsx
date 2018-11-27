@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import UserList from './userlist.jsx'
-import firebase from '../../config/firebase'
-import Chat from '../chat'
+import UserList from './userlist'
+import firebase from '../../../config/firebase'
+import Chat from '../../chat'
 import { Grid, Segment, Divider, Input, Button, Image, Header, Modal, Dropdown, Message } from 'semantic-ui-react'
 
 class Lobby extends Component {

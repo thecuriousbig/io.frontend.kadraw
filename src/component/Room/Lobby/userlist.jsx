@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import User from './user'
-import firebase from "../../config/firebase";
+import User from '../user'
+import firebase from "../../../config/firebase";
 class UserList extends Component {
   constructor(props) {
     super(props);
