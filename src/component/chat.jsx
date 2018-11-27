@@ -3,21 +3,22 @@ import firebase from './../config/firebase'
 
 import Message from './message'
 
-import { Grid, Header, Segment, Input, Button, Icon } from 'semantic-ui-react'
+import { Grid, Segment, Input } from 'semantic-ui-react'
 
 class Chat extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			author: 'biggy',
+			author: this.props.user.author,
+			avatar: this.props.user.avatar,
 			message: '',
 			list: []
 		}
-		console.log('chat : ', this.props)
 		this.messageRef = firebase
 			.database()
 			.ref()
 			.child(this.props.lobbyId)
+		console.log(this.state)
 	}
 
 	handleChange = event => {
@@ -49,13 +50,10 @@ class Chat extends Component {
 	render() {
 		return (
 			<Grid>
-				<Grid.Column style={{ maxWidth: '600px', padding: '0 2px' }}>
-					<Header as="h1" textAlign="center">
-						Chat
-					</Header>
-					<Segment style={{ maxHeight: '300px', overflow: 'auto' }}>
+				<Grid.Column style={{ maxWidth: '600px' }}>
+					<Segment style={{ maxHeight: '200px', overflow: 'auto' }}>
 						{this.state.list.map((message, index) => (
-							<Message key={index} message={message} />
+							<Message key={index} message={message} author={this.state.author} avatar={this.state.avatar} />
 						))}
 					</Segment>
 					<Input

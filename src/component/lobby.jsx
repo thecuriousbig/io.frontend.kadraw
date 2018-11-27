@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import UserList from './Room/userlist.jsx'
 import firebase from '../config/firebase'
 import Chat from './chat'
-import { Grid, Segment, Input, Button, Image, Dropdown } from 'semantic-ui-react'
+import { Grid, Segment, Input, Button, Image, Dropdown} from 'semantic-ui-react'
 
 class Lobby extends Component {
 	constructor(props) {
@@ -20,12 +20,13 @@ class Lobby extends Component {
 		}
 		this.db = firebase.firestore()
 		this.lobbyRef = this.db.collection('Lobby')
-		this.lobbyId = null
+    this.lobbyId = this.props.match.params.lobbyId
+    console.log(this.lobbyId)
 		this.playRoomRef = this.db.collection('PlayRoom')
 	}
 
 	async getRoomInfo(lobbyId) {
-		await this.lobbyRef.doc(lobbyId).onSnapshot(
+		 await this.lobbyRef.doc(lobbyId).onSnapshot(
 			function(snapshot) {
 				if (!snapshot.exists) {
 					console.log('No such document!')
@@ -106,7 +107,17 @@ class Lobby extends Component {
 	componentWillUnmount() {
 		const unsubscribe = this.lobbyRef.onSnapshot(function() {})
 		unsubscribe()
-	}
+  }
+  
+  handleChange = (event, data) => {
+    if (event.target.name === 'roundSetting') {
+      this.setState({room:{setting:{numberOfRound: data.value}}})
+    } else if (event.target.name === 'timerSetting') {
+      this.setState({room:{setting:{timer: data.value}}})
+    } else {
+      
+    }
+  }
 
 	renderStartButton = () => {
 		return <Button size="big" fluid content="Start Game" style={{ backgroundColor: '#3a6bff', color: 'white' }} />
@@ -118,6 +129,7 @@ class Lobby extends Component {
 
 	render() {
 		const users = this.state.room.users
+		const chatProps = { author: this.props.location.state.username, avatar: this.props.location.state.avatar }
 		const setting = this.state.room.setting
 		const { numberOfPlayer, numberOfRound } = setting
 		const isAllUsersReadyString = this.state.isAllUserReady ? 'Yes' : 'No'
@@ -139,23 +151,8 @@ class Lobby extends Component {
 			{ key: 4, text: '120', value: 120 },
 			{ key: 4, text: '150', value: 150 }
 		]
-		return (
-			<div>
-				<Grid
-					textAlign="center"
-					style={{
-						height: '100vh',
-						width: '100%',
-						margin: '0px',
-						backgroundImage:
-							'url(https://firebasestorage.googleapis.com/v0/b/io-frontend-kadraw-c5925.appspot.com/o/bg%2FBG.png?alt=media&token=61985a43-6c24-4d1e-9fe5-5fe8a168e51b)',
-						backgroundRepeat: 'no-repeat',
-						backgroundPosition: 'center',
-						backgroundSize: 'cover'
-					}}
-					verticalAlign="middle"
-					columns={2}
-				>
+		return <div>
+				<Grid textAlign="center" style={{ height: '100vh', width: '100%', margin: '0px', backgroundImage: 'url(https://firebasestorage.googleapis.com/v0/b/io-frontend-kadraw-c5925.appspot.com/o/bg%2FBG.png?alt=media&token=61985a43-6c24-4d1e-9fe5-5fe8a168e51b)', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', backgroundSize: 'cover' }} verticalAlign="middle" columns={2}>
 					<style>{`
 					body > div,
 					body > div > div,
@@ -164,12 +161,7 @@ class Lobby extends Component {
 					}
 				`}</style>
 					<Grid.Row stretched style={{ height: '120px', padding: '24px' }}>
-						<Image
-							wrapped
-							style={{ textAlign: 'center' }}
-							size="large"
-							src="https://firebasestorage.googleapis.com/v0/b/io-frontend-kadraw-c5925.appspot.com/o/logo%2Flogo_kadraw.png?alt=media&token=2e9cdbd0-f64a-4a06-b94a-67b0553b71f0"
-						/>
+						<Image wrapped style={{ textAlign: 'center' }} size="large" src="https://firebasestorage.googleapis.com/v0/b/io-frontend-kadraw-c5925.appspot.com/o/logo%2Flogo_kadraw.png?alt=media&token=2e9cdbd0-f64a-4a06-b94a-67b0553b71f0" />
 					</Grid.Row>
 
 					<Grid.Row stretched columns="equal" style={{ height: '80%', maxWidth: '60%', padding: '0px' }}>
@@ -180,22 +172,10 @@ class Lobby extends Component {
 								<UserList users={users} handleReady={this.onReady} />
 								<Grid textAlign="center" verticalAlign="middle" columns={2}>
 									<Grid.Column width={8}>
-										<Button
-											basic
-											color="blue"
-											size="big"
-											fluid
-											content="Leave Game"
-											style={{ backgroundColor: '#3a6bff', color: 'white' }}
-										/>
+										<Button basic color="blue" size="big" fluid content="Leave Game" style={{ backgroundColor: '#3a6bff', color: 'white' }} />
 									</Grid.Column>
 									<Grid.Column width={8}>
-										<Button
-											size="big"
-											fluid
-											content="Start Game"
-											style={{ backgroundColor: '#3a6bff', color: 'white' }}
-										/>
+										<Button size="big" fluid content={isAllUsersReadyString === 'Yes' ? 'Start Game' : 'Ready'} style={{ backgroundColor: '#3a6bff', color: 'white' }} onClick={this.startGame.bind(this, this.lobbyId)} />
 									</Grid.Column>
 								</Grid>
 							</Segment>
@@ -207,19 +187,7 @@ class Lobby extends Component {
 										<h2 style={{ color: '#3a6bff' }}>Room ID </h2>
 									</Grid.Column>
 									<Grid.Column>
-										<Input
-											fluid
-											color="blue"
-											type="number"
-											size="big"
-											placeholder="12 34 56"
-											name="lobbyId"
-											value={this.lobbyId}
-											action={{
-												color: 'blue',
-												content: 'Copy'
-											}}
-										/>
+										<Input fluid color="blue" type="number" size="big" placeholder="12 34 56" name="lobbyId" value={this.lobbyId} action={{ color: 'blue', content: 'Copy' }} />
 									</Grid.Column>
 								</Grid>
 							</Segment>
@@ -228,40 +196,28 @@ class Lobby extends Component {
 								<Grid columns={2}>
 									<Grid.Column textAlign="left">
 										<h3 style={{ color: '#3a6bff' }}>Rounds </h3>
-										<Dropdown
-											fluid
-											selection
-											options={roundOptions}
-											name="roundSetting"
-											value={this.state.room.setting.numberOfRound}
-										/>
+										<Dropdown fluid selection options={roundOptions} name="roundSetting" value={this.state.room.setting.numberOfRound} onChange={this.handleChange} />
 									</Grid.Column>
 									<Grid.Column textAlign="left">
 										<h3 style={{ color: '#3a6bff' }}>Timers </h3>
-										<Dropdown
-											fluid
-											selection
-											options={timerOptions}
-											name="timerSetting"
-											value={this.state.room.setting.timer}
-										/>
+										<Dropdown fluid selection options={timerOptions} name="timerSetting" value={this.state.room.setting.timer} onChange={this.handleChange} />
 									</Grid.Column>
 								</Grid>
 							</Segment>
 							<Segment style={{ height: '45%' }}>
 								<h1 style={{ color: '#3a6bff' }}>Chat</h1>
+								<Chat lobbyId={this.lobbyId} user={chatProps} />
 							</Segment>
 						</Grid.Column>
 					</Grid.Row>
 				</Grid>
 			</div>
-		)
 	}
 }
 
 export default Lobby
 
-// <Grid.Row columns="equal" style={{ maxWidth: '60%', padding: '0px' }}>
+//  <Grid.Row columns="equal" style={{ maxWidth: '60%', padding: '0px' }}>
 //   <Grid.Column width={7} style={{ height: '75%', padding: '14px' }}>
 //     <Segment style={{ height: '100%' }}>
 //       <h1 style={{ color: '#3a6bff' }}>Player</h1>

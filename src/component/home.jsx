@@ -135,7 +135,12 @@ class Home extends Component {
 					console.log('err ', err)
 				}
 			)
-			this.props.history.push(`/lobby/${user.lobbyId}`)
+			const userLocalStorage = { name: user.name, avatar: user.avatar }
+			localStorage.setItem('user', JSON.stringify(userLocalStorage))
+			this.props.history.push({
+				pathname: `/lobby/${user.lobbyId}`,
+				state: { username: user.name, avatar: user.avatar }
+			})
 		}
 	}
 
@@ -176,7 +181,9 @@ class Home extends Component {
 			.catch(err => console.log('err ', err))
 
 		this.closeModal()
-		this.props.history.push(`/lobby/${user.lobbyId}`)
+		const userLocalStorage = { name: user.name, avatar: user.avatar }
+		localStorage.setItem('user', JSON.stringify(userLocalStorage))
+		this.props.history.push({ pathname: `/lobby/${user.lobbyId}`, state: { username: user.name, avatar: user.avatar } })
 	}
 
 	changeAvatar = event => {

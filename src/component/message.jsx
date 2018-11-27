@@ -4,15 +4,16 @@ import { Comment } from 'semantic-ui-react'
 class Message extends Component {
 	constructor(props) {
 		super(props)
+		console.log('this.props: ', this.props)
 	}
 
 	render() {
 		return (
 			<Comment.Group>
 				<Comment style={{ textAlign: 'left' }}>
-					<Comment.Avatar src={this.props.message.avatar} />
+					<Comment.Avatar src={this.props.avatar} />
 					<Comment.Content>
-						<Comment.Author style={{ color: 'blue' }}>{this.props.message.author}</Comment.Author>
+						<Comment.Author style={{ color: 'blue' }}>{this.props.author}</Comment.Author>
 						<Comment.Text>{this.props.message.message}</Comment.Text>
 					</Comment.Content>
 				</Comment>
