@@ -1,14 +1,17 @@
 import React, { Component } from "react";
+import User from './user'
 import firebase from "../../config/firebase";
-class UserTab extends Component {
+class UserList extends Component {
   constructor(props) {
     super(props);
+    this.lobbyRef = firebase.firestore().collection('Lobby');
     this.state = {
       users: []
     };
   }
+
   componentDidUpdate(prevProps, prevState) {
-    if ((this.props.users !== prevProps.users) && this.props.users.length > 0) {
+    if ((this.props !== prevProps) && this.props.users.length > 0) {
       this.getAllUsersInfo(this.props.users);
     }
   }
@@ -16,7 +19,7 @@ class UserTab extends Component {
     const usersWithInfo = await Promise.all(
       users.map(async user => {
         const userInfo = await this.getUserInfo(user.id)
-        return { ...userInfo, role: user.role };
+        return { ...userInfo, id: user.id, role: user.role, ready: user.ready };
       })
     )
     this.setState({ users: usersWithInfo });
@@ -39,26 +42,36 @@ class UserTab extends Component {
       });
     return userData;
   }
+  handleClickReady(userId) {
+    this.props.handleReady(userId);
+  }
   renderUserElement() {
     if (this.state.users.length > 0) {
       return this.state.users.map(user => {
+        const readyState = user.ready ? 'ready' : 'not ready...';
+        const readyButton = (
+          <button onClick={this.handleClickReady.bind(this, user.id)}>{user.ready ? 'Unready' : 'Ready'}</button>
+        )
         return (
           <li>
-            <strong>{user.role}</strong> : {user.name}
+            <User user={user} />
+            {user.role === 'Leader' ? null : readyState}
+            {user.role === 'Leader' ? null : readyButton}
           </li>
-        );
+        )
       });
     }
     return 'No user'
   }
+
   render() {
-    let user_ele = this.renderUserElement();
+    let users_ele = this.renderUserElement();
     return (
       <div>
-        <ul>{user_ele}</ul>
+        <ul>{users_ele}</ul>
       </div >
     );
   }
 }
 
-export default UserTab;
+export default UserList;
