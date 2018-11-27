@@ -123,7 +123,11 @@ class Home extends Component {
 					this.lobbyRef
 						.doc(user.lobbyId)
 						.update({
-							users: firebase.firestore.FieldValue.arrayUnion({ id: doc.id, role: 'Member' })
+							users: firebase.firestore.FieldValue.arrayUnion({
+								id: doc.id,
+								ready: false,
+								role: 'Member'
+							})
 						})
 						.then(() => console.log('add player to lobby complete'), err => console.log('err ', err))
 				},
@@ -158,7 +162,7 @@ class Home extends Component {
 		await this.userRef
 			.add(user)
 			.then(doc => {
-				lobby.users.push({ id: doc.id, role: 'Leader' })
+				lobby.users.push({ id: doc.id, ready: true, role: 'Leader' })
 				console.log(`add user [${doc.id}] complete`)
 			})
 			.catch(err => console.log('err ', err))
@@ -208,7 +212,18 @@ class Home extends Component {
 		const { haveError, error } = this.state
 
 		return (
-			<div className="login-form">
+			<div
+				className="login-form"
+				style={{
+					backgroundPosition: 'center',
+					backgroundSize: 'cover',
+					backgroundRepeat: 'no-repeat',
+					backgroundImage:
+						'url(https://firebasestorage.googleapis.com/v0/b/io-frontend-kadraw-c5925.appspot.com/o/bg%2FBG.png?alt=media&token=61985a43-6c24-4d1e-9fe5-5fe8a168e51b)',
+					width: '100%',
+					height: '100vh'
+				}}
+			>
 				<style>{`
 					body > div,
 					body > div > div,
@@ -216,34 +231,98 @@ class Home extends Component {
 						height: 100%;
 					}
 				`}</style>
-				<Grid textAlign="center" style={{ height: '100%' }} verticalAlign="middle">
+				<Grid textAlign="center" style={{ height: '100%', marginTop: '0px' }} verticalAlign="middle">
 					<Grid.Column style={{ maxWidth: 650 }}>
-						<Header as="h1" textAlign="center">
-							Kadraw.io
-						</Header>
+						<Image
+							wrapped
+							style={{ textAlign: 'center' }}
+							size="large"
+							src="https://firebasestorage.googleapis.com/v0/b/io-frontend-kadraw-c5925.appspot.com/o/logo%2Flogo_kadraw.png?alt=media&token=2e9cdbd0-f64a-4a06-b94a-67b0553b71f0"
+						/>
 
-						<Segment clearing padded="very">
+						<Segment
+							clearing
+							style={{
+								padding: '64px',
+								borderRadius: '10px'
+							}}
+						>
 							<Grid columns={3} centered>
-								<Button circular size="mini" icon="arrow left" name="left" onClick={this.changeAvatar} />
-								<Image src={this.state.avatar[this.state.avatarId]} circular style={{ width: '50%', height: '50%' }} bordered />
-								<Button circular size="mini" icon="arrow right" name="right" onClick={this.changeAvatar} />
+								<Grid.Column verticalAlign="middle" textAlign="right">
+									<Button
+										compact
+										circular
+										size="mini"
+										icon="arrow left"
+										name="left"
+										onClick={this.changeAvatar}
+										style={{ backgroundColor: '#3a6bff', color: 'white' }}
+									/>
+								</Grid.Column>
+								<Grid.Column stretched style={{ padding: '0px' }}>
+									<Image
+										src={this.state.avatar[this.state.avatarId]}
+										circular
+										style={{
+											width: '100%',
+											height: '100%',
+											padding: '0px',
+											borderWidth: '2px',
+											borderColor: '#3a6cff'
+										}}
+										bordered
+									/>
+								</Grid.Column>
+								<Grid.Column verticalAlign="middle" textAlign="left">
+									<Button
+										color="blue"
+										compact
+										circular
+										size="mini"
+										icon="arrow right"
+										name="right"
+										onClick={this.changeAvatar}
+										style={{ backgroundColor: '#3a6bff', color: 'white' }}
+									/>
+								</Grid.Column>
 							</Grid>
 
-							<h3 style={{ textAlign: 'left' }}>Your Name</h3>
-							<Input fluid placeholder="Guest" name="name" value={this.state.name} onChange={this.handleChange} />
-							<h3 style={{ textAlign: 'left' }}>Join Room</h3>
+							<h3 style={{ textAlign: 'left', color: '#3a6bff' }}>Your Name</h3>
+							<Input
+								color="blue"
+								fluid
+								size="big"
+								placeholder="Guest"
+								name="name"
+								value={this.state.name}
+								onChange={this.handleChange}
+							/>
+							<h3 style={{ textAlign: 'left', color: '#3a6bff' }}>Join Room</h3>
 							<Input
 								fluid
+								color="blue"
 								type="number"
+								size="big"
 								placeholder="12 34 56"
 								name="lobbyId"
 								value={this.state.lobbyId}
 								onChange={this.handleChange}
-								action={{ content: 'Join', onClick: this.joinLobby }}
+								action={{
+									color: 'blue',
+									content: 'Join',
+									onClick: this.joinLobby
+								}}
 							/>
 							{haveError ? <Message error header="Action Forbidden" content={error} /> : ''}
 							<Divider horizontal>Or</Divider>
-							<Button fluid content="Create Lobby" onClick={this.showModal} />
+							<Button
+								color="blue"
+								size="big"
+								fluid
+								content="Create Lobby"
+								onClick={this.showModal}
+								style={{ backgroundColor: '#3a6bff', color: 'white' }}
+							/>
 						</Segment>
 					</Grid.Column>
 				</Grid>

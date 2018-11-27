@@ -1,6 +1,8 @@
-import React, { Component } from "react";
-import UserList from "./Room/userlist.jsx";
-import firebase from "../config/firebase";
+import React, { Component } from 'react'
+import UserList from './Room/userlist.jsx'
+import firebase from '../config/firebase'
+import Chat from './chat'
+import { Grid, Segment, Divider, Input, Button, Image, Header, Modal, Dropdown, Message } from 'semantic-ui-react'
 
 class Lobby extends Component {
   constructor(props) {
@@ -106,24 +108,65 @@ class Lobby extends Component {
     unsubscirbe();
   }
   render() {
-    const users = this.state.room.users;
-    const setting = this.state.room.setting;
-    const { numberOfPlayer, numberOfRound, timer } = setting;
+    const users = this.state.room.users
+    const setting = this.state.room.setting
+    const { numberOfPlayer, numberOfRound, timer } = setting
     const isAllUsersReadyString = this.state.isAllUserReady ? 'Yes' : 'No';
     return (
       <div>
-        <h1>Lobby bitch</h1>
-        <h3>ID : {this.lobbyId}</h3>
-        Player : {users.length} / {numberOfPlayer}
-        <br />
-        Round : {numberOfRound}
-        Timer : {timer}
-        <UserList users={users} handleReady={this.onReady.bind(this)} />
-        All is ready : {isAllUsersReadyString} <br />
-        <button disabled={!this.state.isAllUserReady} onClick={this.startGame.bind(this, this.lobbyId)}>Start game</button>
+        <Grid
+          textAlign="center"
+          style={{
+            height: '100vh',
+            width: '100%',
+            margin: '0px',
+            backgroundImage:
+              'url(https://firebasestorage.googleapis.com/v0/b/io-frontend-kadraw-c5925.appspot.com/o/bg%2FBG.png?alt=media&token=61985a43-6c24-4d1e-9fe5-5fe8a168e51b)',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            backgroundSize: 'cover'
+          }}
+          verticalAlign="middle"
+          columns={2}
+        >
+          <style>{`
+					body > div,
+					body > div > div,
+					body > div > div > div.login-form {
+						height: 100%;
+					}
+				`}</style>
+          <Grid.Row columns="equal" style={{ maxWidth: '60%', padding: '0px' }}>
+            <Grid.Column width={7} style={{ height: '75%', padding: '14px' }}>
+              <Segment style={{ height: '100%' }}>
+                <h1 style={{ color: '#3a6bff' }}>Player</h1>
+
+                <UserList users={users} handleReady={this.onReady.bind(this)} />
+              </Segment>
+            </Grid.Column>
+            <Grid.Column style={{ height: '75%', padding: '14px' }}>
+              <Segment style={{ height: '15%' }}>
+                <h3>Room ID : {this.lobbyId}</h3>
+              </Segment>
+              <Segment style={{ height: '35%' }}>
+                Player : {users.length} / {numberOfPlayer}
+                <br />
+                Round : {numberOfRound}
+                <br />
+                Timer : {timer}
+                <br />
+                All is ready : {isAllUsersReadyString}
+              </Segment>
+              <Segment style={{ height: '45%' }}>
+                <h1 style={{ color: '#3a6bff' }}>Chat</h1>
+                <button disabled={!this.state.isAllUserReady} onClick={this.startGame.bind(this, this.lobbyId)}>Start game</button>
+              </Segment>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       </div>
-    );
+    )
   }
 }
 
-export default Lobby;
+export default Lobby
