@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Route } from 'react-router-dom'
 
 import Home from './component/home'
-import Lobby from './component/lobby'
+import Lobby from './component/Room/lobby'
 class App extends Component {
 	render() {
 		return (
