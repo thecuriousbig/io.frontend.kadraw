@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import User from '../user'
 import firebase from "../../../config/firebase";
+import '../../kadraw.css';
+import { Button } from 'semantic-ui-react';
+
 class UserList extends Component {
   constructor(props) {
     super(props);
@@ -11,34 +14,34 @@ class UserList extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if ((this.props !== prevProps) && this.props.users.length > 0) {
+    if (this.props !== prevProps && this.props.users.length > 0) {
       this.getAllUsersInfo(this.props.users);
     }
   }
   async getAllUsersInfo(users) {
     const usersWithInfo = await Promise.all(
       users.map(async user => {
-        const userInfo = await this.getUserInfo(user.id)
+        const userInfo = await this.getUserInfo(user.id);
         return { ...userInfo, id: user.id, role: user.role, ready: user.ready };
       })
-    )
+    );
     this.setState({ users: usersWithInfo });
   }
   getUserInfo(userId) {
-    const userRef = firebase.firestore().collection("User");
+    const userRef = firebase.firestore().collection('User');
     var userData = userRef
       .doc(userId)
       .get()
-      .then((doc) => {
+      .then(doc => {
         if (!doc.exists) {
-          console.log("No such document!");
+          console.log('No such document!');
         } else {
-          const { avatar, lobbyId, name, score } = doc.data()
-          return { avatar, lobbyId, name, score }
+          const { avatar, lobbyId, name, score } = doc.data();
+          return { avatar, lobbyId, name, score };
         }
       })
       .catch(err => {
-        console.log("Error getting document", err);
+        console.log('Error getting document', err);
       });
     return userData;
   }
@@ -48,20 +51,22 @@ class UserList extends Component {
   renderUserElement() {
     if (this.state.users.length > 0) {
       return this.state.users.map(user => {
-        const readyState = user.ready ? 'ready' : 'not ready...';
+        const readyState = user.ready ? 'ready' : 'not ready';
         const readyButton = (
-          <button onClick={this.handleClickReady.bind(this, user.id)}>{user.ready ? 'Unready' : 'Ready'}</button>
-        )
+          <Button onClick={this.handleClickReady.bind(this, user.id)}>
+            {user.ready ? 'Unready' : 'Ready'}
+          </Button>
+        );
         return (
-          <li>
+          <li style={{ padding: '0px' }}>
             <User user={user} />
             {user.role === 'Leader' ? null : readyState}
             {user.role === 'Leader' ? null : readyButton}
           </li>
-        )
+        );
       });
     }
-    return 'No user'
+    return 'No user';
   }
 
   render() {
@@ -69,7 +74,7 @@ class UserList extends Component {
     return (
       <div>
         <ul>{users_ele}</ul>
-      </div >
+      </div>
     );
   }
 }

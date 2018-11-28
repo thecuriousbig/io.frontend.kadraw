@@ -1,0 +1,280 @@
+ul {
+  list-style-type: none;
+  padding: 0px 0px 0px 16px;
+}
+
+/*--------Button         */
+.ui.button {
+  cursor: pointer;
+  display: inline-block;
+  min-height: 1em;
+  outline: none;
+  border: none;
+  vertical-align: baseline;
+  background: #3a6bff none;
+  color: rgb(255, 255, 255);
+  margin: 0em 0.25em 0em 0em;
+  padding: 0.78571429em 1.5em 0.78571429em;
+  text-transform: none;
+  text-shadow: none;
+  font-weight: bold;
+  line-height: 1em;
+  font-style: normal;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  -webkit-box-shadow: 0px 0px 0px 1px transparent inset,
+    0px 0em 0px 0px rgba(34, 36, 38, 0.15) inset;
+  box-shadow: 0px 0px 0px 1px transparent inset,
+    0px 0em 0px 0px rgba(34, 36, 38, 0.15) inset;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: opacity 0.1s ease, background-color 0.1s ease,
+    color 0.1s ease, background 0.1s ease, -webkit-box-shadow 0.1s ease;
+  transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease,
+    background 0.1s ease, -webkit-box-shadow 0.1s ease;
+  transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease,
+    box-shadow 0.1s ease, background 0.1s ease;
+  transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease,
+    box-shadow 0.1s ease, background 0.1s ease, -webkit-box-shadow 0.1s ease;
+  will-change: '';
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ui.button:hover {
+  background-color: #3a4aff;
+  background-image: none;
+  -webkit-box-shadow: 0px 0px 0px 1px transparent inset,
+    0px 0em 0px 0px rgba(34, 36, 38, 0.15) inset;
+  box-shadow: 0px 0px 0px 1px transparent inset,
+    0px 0em 0px 0px rgba(34, 36, 38, 0.15) inset;
+  color: rgb(255, 255, 255);
+  border-radius: 0.5rem;
+}
+.ui.button:hover .icon {
+  opacity: 0.85;
+}
+
+.ui.blue.buttons .button,
+.ui.blue.button {
+  background-color: #3a6bff;
+  color: #ffffff;
+  text-shadow: none;
+  background-image: none;
+  border-radius: 0.5rem;
+}
+.ui.blue.button {
+  -webkit-box-shadow: 0px 0em 0px 0px rgba(34, 36, 38, 0.15) inset;
+  box-shadow: 0px 0em 0px 0px rgba(34, 36, 38, 0.15) inset;
+  border-radius: 0.5rem;
+}
+.ui.blue.buttons .button:hover,
+.ui.blue.button:hover {
+  background-color: #3a4aff;
+  color: #ffffff;
+  text-shadow: none;
+  border-radius: 0.5rem;
+}
+.ui.blue.buttons .button:focus,
+.ui.blue.button:focus {
+  background-color: #3a4aff;
+  color: #ffffff;
+  text-shadow: none;
+  border-radius: 0.5rem;
+}
+.ui.blue.buttons .button:active,
+.ui.blue.button:active {
+  background-color: #3a6bff;
+  color: #ffffff;
+  text-shadow: none;
+  border-radius: 0.5rem;
+}
+.ui.blue.buttons .active.button,
+.ui.blue.buttons .active.button:active,
+.ui.blue.active.button,
+.ui.blue.button .active.button:active {
+  background-color: #3a6bff;
+  color: #ffffff;
+  text-shadow: none;
+  border-radius: 0.5rem;
+}
+
+/* Basic */
+.ui.basic.blue.buttons .button,
+.ui.basic.blue.button {
+  -webkit-box-shadow: 0px 0px 0px 1px #3a6bff inset !important;
+  box-shadow: 0px 0px 0px 1px #3a6bff inset !important;
+  color: #3a6bff !important;
+  border: 2px solid #3a64ff;
+  text-transform: none;
+  text-shadow: none;
+  font-weight: bold;
+  line-height: 1em;
+  font-style: normal;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0.5rem;
+}
+.ui.basic.blue.buttons .button:hover,
+.ui.basic.blue.button:hover {
+  background: transparent !important;
+  -webkit-box-shadow: 0px 0px 0px 1px #3a4aff inset !important;
+  box-shadow: 0px 0px 0px 1px #3a4aff inset !important;
+  color: #3a4aff !important;
+  border: 2px solid #3a64ff;
+  text-transform: none;
+  text-shadow: none;
+  font-weight: bold;
+  line-height: 1em;
+  font-style: normal;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0.5rem;
+}
+.ui.basic.blue.buttons .button:focus,
+.ui.basic.blue.button:focus {
+  background: transparent !important;
+  -webkit-box-shadow: 0px 0px 0px 1px #3a4aff inset !important;
+  box-shadow: 0px 0px 0px 1px #3a4aff inset !important;
+  color: #3a4aff !important;
+  border: 2px solid #3a64ff;
+  text-transform: none;
+  text-shadow: none;
+  font-weight: bold;
+  line-height: 1em;
+  font-style: normal;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0.5rem;
+}
+.ui.basic.blue.buttons .active.button,
+.ui.basic.blue.active.button {
+  background: transparent !important;
+  -webkit-box-shadow: 0px 0px 0px 1px #3a6bff inset !important;
+  box-shadow: 0px 0px 0px 1px #3a6bff inset !important;
+  color: #3a6bff !important;
+  border: 2px solid #3a64ff;
+  text-transform: none;
+  text-shadow: none;
+  font-weight: bold;
+  line-height: 1em;
+  font-style: normal;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0.5rem;
+}
+.ui.basic.blue.buttons .button:active,
+.ui.basic.blue.button:active {
+  -webkit-box-shadow: 0px 0px 0px 1px #3a6bff inset !important;
+  box-shadow: 0px 0px 0px 1px #3a6bff inset !important;
+  color: #3a6bff !important;
+  border: 2px solid #3a6bff;
+  text-transform: none;
+  text-shadow: none;
+  font-weight: bold;
+  line-height: 1em;
+  font-style: normal;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0.5rem;
+}
+.ui.buttons:not(.vertical) > .basic.blue.button:not(:first-child) {
+  margin-left: -1px;
+}
+
+/*------INPUT      */
+.ui.input > input {
+  margin: 0em;
+  max-width: 100%;
+  -webkit-box-flex: 1;
+  -ms-flex: 1 0 auto;
+  flex: 1 0 auto;
+  outline: none;
+  -webkit-tap-highlight-color: #3a6bff;
+  text-align: left;
+  line-height: 1.21428571em;
+  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  padding: 0.67857143em 1em;
+  background: #ffffff;
+  border: 2px solid #3a64ff;
+  color: #3a6bff;
+  border-radius: 0.28571429rem;
+  -webkit-transition: border-color 0.1s ease, -webkit-box-shadow 0.1s ease;
+  transition: border-color 0.1s ease, -webkit-box-shadow 0.1s ease;
+  transition: box-shadow 0.1s ease, border-color 0.1s ease;
+  transition: box-shadow 0.1s ease, border-color 0.1s ease,
+    -webkit-box-shadow 0.1s ease;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.ui.input.focus > input,
+.ui.input > input:focus {
+  border-color: #3a64ff;
+  background: #ffffff;
+  color: rgba(0, 0, 0, 0.8);
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.ui.input.focus > input::-webkit-input-placeholder,
+.ui.input > input:focus::-webkit-input-placeholder {
+  color: rgba(115, 115, 115, 0.87);
+}
+.ui.input.focus > input::-moz-placeholder,
+.ui.input > input:focus::-moz-placeholder {
+  color: rgba(115, 115, 115, 0.87);
+}
+.ui.input.focus > input:-ms-input-placeholder,
+.ui.input > input:focus:-ms-input-placeholder {
+  color: rgba(115, 115, 115, 0.87);
+}
+
+/*******************************
+            Dropdown
+*******************************/
+
+.ui.dropdown {
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  outline: none;
+  text-align: left;
+  -webkit-transition: width 0.1s ease, -webkit-box-shadow 0.1s ease;
+  transition: width 0.1s ease, -webkit-box-shadow 0.1s ease;
+  transition: box-shadow 0.1s ease, width 0.1s ease;
+  transition: box-shadow 0.1s ease, width 0.1s ease,
+    -webkit-box-shadow 0.1s ease;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* Focus */
+.ui.selection.dropdown:focus {
+  border-color: #3a9cff;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.ui.selection.dropdown:focus .menu {
+  border-color: #3a9cff;
+  -webkit-box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15);
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15);
+}
+
+/* Visible */
+.ui.selection.visible.dropdown > .text:not(.default) {
+  font-weight: normal;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/* Visible Hover */
+.ui.selection.active.dropdown:hover {
+  border-color: #3a9cff;
+  -webkit-box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15);
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15);
+}
+.ui.selection.active.dropdown:hover .menu {
+  border-color: #3a9cff;
+  -webkit-box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15);
+  box-shadow: 0px 2px 3px 0px rgba(34, 36, 38, 0.15);
+}

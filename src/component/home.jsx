@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import firebase from '../config/firebase'
 import chance from 'chance'
 import { withRouter } from 'react-router-dom'
-
-import { Grid, Segment, Divider, Input, Button, Image, Header, Modal, Dropdown, Message } from 'semantic-ui-react'
+import './kadraw.css'
+import { Grid, Segment, Divider, Input, Button, Image, Modal, Dropdown, Message } from 'semantic-ui-react'
 
 class Home extends Component {
 	constructor(props) {
@@ -135,7 +135,12 @@ class Home extends Component {
 					console.log('err ', err)
 				}
 			)
-			this.props.history.push(`/lobby/${user.lobbyId}`)
+			const userLocalStorage = { name: user.name, avatar: user.avatar }
+			localStorage.setItem('user', JSON.stringify(userLocalStorage))
+			this.props.history.push({
+				pathname: `/lobby/${user.lobbyId}`,
+				state: { username: user.name, avatar: user.avatar }
+			})
 		}
 	}
 
@@ -176,7 +181,9 @@ class Home extends Component {
 			.catch(err => console.log('err ', err))
 
 		this.closeModal()
-		this.props.history.push(`/lobby/${user.lobbyId}`)
+		const userLocalStorage = { name: user.name, avatar: user.avatar }
+		localStorage.setItem('user', JSON.stringify(userLocalStorage))
+		this.props.history.push({ pathname: `/lobby/${user.lobbyId}`, state: { username: user.name, avatar: user.avatar } })
 	}
 
 	changeAvatar = event => {
@@ -316,7 +323,6 @@ class Home extends Component {
 							{haveError ? <Message error header="Action Forbidden" content={error} /> : ''}
 							<Divider horizontal>Or</Divider>
 							<Button
-								color="blue"
 								size="big"
 								fluid
 								content="Create Lobby"
@@ -348,7 +354,7 @@ class Home extends Component {
 						/>
 					</Modal.Content>
 					<Modal.Actions>
-						<Button primary icon="checkmark" labelPosition="right" content="Next" onClick={this.createLobby} />
+						<Button icon="checkmark" labelPosition="right" content="Next" onClick={this.createLobby} />
 					</Modal.Actions>
 				</Modal>
 			</div>

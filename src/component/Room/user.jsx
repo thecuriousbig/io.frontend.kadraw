@@ -1,28 +1,30 @@
-import React, { Component } from "react";
-import firebase from "../../config/firebase";
+import React, { Component } from 'react';
+import { Comment } from 'semantic-ui-react';
 class User extends Component {
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props);
+  }
+  renderUserElement() {
+    if (this.props.user) {
+      return (
+        <Comment.Group>
+          <Comment style={{ textAlign: 'left' }}>
+            <Comment.Avatar src={this.props.user.avatar} />
+            <Comment.Content>
+              <Comment.Author style={{ color: 'black', fontSize: '18px' }}>
+                {this.props.user.name}
+              </Comment.Author>
+            </Comment.Content>
+          </Comment>
+        </Comment.Group>
+      );
     }
-    renderUserElement() {
-        if (this.props.user) {
-            return (
-                <div>
-                    <img src={this.props.user.avatar} width="100px" /><br />
-                    <strong>{this.props.user.role}</strong> : {this.props.user.name}<br />
-                </div>
-            )
-        }
-        return;
-    }
-    render() {
-        let user_ele = this.renderUserElement();
-        return (
-            <div>
-                {user_ele}
-            </div >
-        );
-    }
+    return;
+  }
+  render() {
+    let user_ele = this.renderUserElement();
+    return <div>{user_ele}</div>;
+  }
 }
 
 export default User;
