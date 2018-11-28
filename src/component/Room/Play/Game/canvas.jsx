@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-
 class Canvas extends Component {
   constructor(props) {
     super(props);
@@ -29,22 +28,30 @@ class Canvas extends Component {
         start: { ...this.prevPos },
         stop: { ...offSetData }
       };
+      const lineData = {
+        ...positionData,
+        strokeStyle: this.state.strokeStyle,
+        lineWidth: this.state.lineWidth,
+        // userId:...
+      };
 
-      this.line = this.line.concat(positionData);
-      this.paint(this.prevPos, offSetData, this.state.strokeStyle);
+      this.line = this.line.concat(lineData);
+      this.paint(this.prevPos, offSetData, this.state.strokeStyle, this.state.lineWidth);
     }
   }
   endPaintEvent() {
     if (this.isPainting) {
       this.isPainting = false;
+      this.props.onCanvasChange(this.line)
       //send data to database
     }
   }
-  paint(prevPos, currPos, strokeStyle) {
+  paint(prevPos, currPos, strokeStyle, lineWidth) {
     const { offsetX, offsetY } = currPos;
     const { offsetX: x, offsetY: y } = prevPos;
 
     this.ctx.beginPath();
+    this.ctx.lineWidth = lineWidth;
     this.ctx.strokeStyle = strokeStyle;
 
     this.ctx.moveTo(x, y);
@@ -57,33 +64,45 @@ class Canvas extends Component {
   clearCanvas() {
     this.ctx = this.canvas.getContext("2d");
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.line = [];
+    this.props.onCanvasChange(this.line)
   }
   componentDidMount() {
+
     this.canvas.width = 1000;
     this.canvas.height = 800;
     this.ctx = this.canvas.getContext("2d");
     this.ctx.lineJoin = "round";
     this.ctx.lineCap = this.state.lineCap;
-    this.ctx.lineWidth = this.state.lineWidth;
   }
   static getDerivedStateFromProps(props, state) {
-    const newBrushOptions = {
-      strokeStyle: props.brushOptions.color,
-      lineWidth: props.brushOptions.size,
-      lineCap: props.brushOptions.cap
-    };
-    if (state !== newBrushOptions) {
-      return {
-        ...newBrushOptions
+    if (props) {
+      const newBrushOptions = {
+        strokeStyle: props.brushOptions.color,
+        lineWidth: props.brushOptions.size,
+        lineCap: props.brushOptions.cap
       };
+      if (state !== newBrushOptions) {
+        return {
+          ...newBrushOptions
+        };
+      }
     }
     return null;
   }
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     this.ctx = this.canvas.getContext("2d");
     this.ctx.lineJoin = "round";
     this.ctx.lineCap = this.state.lineCap;
     this.ctx.lineWidth = this.state.lineWidth;
+    if ((this.props.newCanvas !== prevProps) && (this.props.newCanvas !== this.line) && this.props.newCanvas && this.props.newCanvas.length) {
+      // if (!currentUserId !== this.props.drawer.id) {
+      if (!this.isPainting) {
+        this.props.newCanvas.forEach(paintData => {
+          this.paint(paintData.start, paintData.stop, paintData.strokeStyle, paintData.lineWidth);
+        })
+      }
+    }
   }
   render() {
     return (

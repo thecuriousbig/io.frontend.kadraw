@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import UserList from './userlist.jsx'
 import firebase from '../../../config/firebase'
-
+import Game from './game.jsx'
 class PlayRoom extends Component {
     constructor(props) {
         super(props);
@@ -13,9 +13,12 @@ class PlayRoom extends Component {
                     numberOfRound: 1,
                     timer: 60
                 },
-                user_score_map: [],
+                painting: { canvas: [], drawer: null },
+                user_score_map: {},
 
-            }
+            },
+            drawer: null,
+            guesser: []
         };
         this.db = firebase.firestore();
         this.playRoomRef = this.db.collection("PlayRoom");
@@ -29,8 +32,13 @@ class PlayRoom extends Component {
                 } else {
                     const playRoomData = snapshot.data();
                     this.playRoomId = playRoomId;
-
-                    this.setState({ playRoom: playRoomData });
+                    const guesser = snapshot.data().users.filter(user => {
+                        if (user.gameRole === 'drawer') {
+                            this.setState({ drawer: user })
+                        }
+                        return user.gameRole === 'guesser'
+                    });
+                    this.setState({ playRoom: playRoomData, guesser });
                 }
             }.bind(this), function (error) {
                 console.log("Error getting room", error);
@@ -42,6 +50,26 @@ class PlayRoom extends Component {
     componentWillUnmount() {
         const unsubscirbe = this.playRoomRef.onSnapshot(function () { });
         unsubscirbe();
+    }
+    addCanvas(canvas, drawer) {
+        this.playRoomRef.doc(this.playRoomId)
+            .update({
+                painting: {
+                    canvas,
+                    drawer
+                }
+            })
+    }
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.playRoom.user_score_map !== prevState.playRoom.user_score_map && this.state.playRoom.user_score_map) {
+            console.log('triggered');
+
+            const usersWithScore = this.state.playRoom.users.map(user => { return { ...user, score: this.state.playRoom.user_score_map[user.id] } })
+            this.setState({ playRoom: { ...this.state.playRoom, users: usersWithScore } });
+        }
+    }
+    async handleCanvasChange(canvas) {
+        await this.addCanvas(canvas, this.state.drawer);
     }
     render() {
         const users = this.state.playRoom.users
@@ -57,6 +85,8 @@ class PlayRoom extends Component {
                 <br />
                 Timer : {timer}
                 <UserList users={this.state.playRoom.users} />
+                <hr />
+                <Game drawer={this.state.drawer} onCanvasChange={this.handleCanvasChange.bind(this)} newCanvas={this.state.playRoom.painting.canvas} />
             </div>
         )
     }

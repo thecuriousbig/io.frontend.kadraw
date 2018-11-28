@@ -18,7 +18,7 @@ class UserList extends Component {
         const usersWithInfo = await Promise.all(
             users.map(async user => {
                 const userInfo = await this.getUserInfo(user.id)
-                return { ...userInfo, id: user.id, role: user.role, gameRole: user.gameRole };
+                return { ...userInfo, id: user.id, role: user.role, gameRole: user.gameRole, gameScore: user.score };
             })
         )
         this.setState({ users: usersWithInfo });
@@ -47,6 +47,8 @@ class UserList extends Component {
                 return (
                     <li>
                         <User user={user} />
+                        <strong>Score : {user.gameScore}</strong>
+                        <br />
                         <strong>{user.gameRole}</strong>
                     </li>
                 )

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Canvas from "./game/canvas.js";
-import Toolbox from "./game/toolbox.js";
+import Canvas from "./Game/canvas.jsx";
+import Toolbox from "./Game/toolbox.jsx";
 class Game extends Component {
   constructor(props) {
     super(props);
@@ -48,6 +48,9 @@ class Game extends Component {
       };
     });
   }
+  handleNewCanvas(canvas) {
+    this.props.onCanvasChange(canvas);
+  }
   handleClearCanvas() {
     if (this.canvas) {
       this.canvas.clearCanvas();
@@ -55,10 +58,11 @@ class Game extends Component {
   }
 
   render() {
-    return <div>
-        <Canvas ref={ref => (this.canvas = ref)} brushOptions={this.state.drawer.brush} />
+
+    return (<div>
+      <Canvas drawer={this.props.drawer} newCanvas={this.props.newCanvas} ref={ref => (this.canvas = ref)} brushOptions={this.state.drawer.brush} onCanvasChange={this.handleNewCanvas.bind(this)} />
       <Toolbox changeBrushColor={this.changeBrushColor.bind(this)} changeBrushSize={this.changeBrushSize.bind(this)} changeBrushCap={this.changeBrushCap.bind(this)} handleClearCanvas={this.handleClearCanvas.bind(this)} />
-      </div>;
+    </div>);
   }
 }
 
