@@ -19,9 +19,10 @@ class Lobby extends Component {
 			isAllUserReady: false
 		}
 		this.db = firebase.firestore()
+		this.thisUsername = this.props.location.state.username
 		this.lobbyRef = this.db.collection('Lobby')
+		this.userRef = this.db.collection('User')
 		this.lobbyId = this.props.match.params.lobbyId
-		console.log(this.lobbyId)
 		this.playRoomRef = this.db.collection('PlayRoom')
 	}
 
@@ -32,10 +33,17 @@ class Lobby extends Component {
 					console.log('No such document!')
 				} else {
 					const roomData = snapshot.data()
+					console.log('roomData', roomData)
 					this.lobbyId = lobbyId
-					const isAllUserReady = roomData.users.reduce((accReady, currentUser) => accReady && currentUser.ready)
+					let isAllUserReady
+					if (roomData.users.length !== 0) {
+						isAllUserReady = roomData.users.reduce((accReady, currentUser) => accReady && currentUser.ready)
+						this.setState({ room: roomData, isAllUserReady })
+					} else {
+						isAllUserReady = false
 
-					this.setState({ room: roomData, isAllUserReady })
+						this.setState({ room: roomData, isAllUserReady })
+					}
 				}
 			}.bind(this),
 			function(error) {
@@ -101,6 +109,41 @@ class Lobby extends Component {
 			})
 		}
 	}
+
+	leaveRoom = async () => {
+		const leaveuser = await this.userRef
+			.where('name', '==', this.thisUsername)
+			.get()
+			.then(querySnapshot => {
+				return querySnapshot.docs[0]
+			})
+		const userData = await this.lobbyRef
+			.doc(this.lobbyId)
+			.get()
+			.then(doc => {
+				if (!doc.exists) {
+					console.log('No such document!')
+				} else {
+					console.log(doc.data().users)
+					return doc.data().users
+				}
+			})
+
+		console.log('user data ', userData)
+
+		let i
+		userData.forEach((data, index) => {
+			if (data.id === leaveuser) {
+				i = index
+			}
+		})
+		userData.splice(i, 1)
+		await this.lobbyRef.doc(this.lobbyId).update({
+			users: userData
+		})
+		this.props.history.goBack()
+	}
+
 	componentDidMount() {
 		this.getRoomInfo(this.props.match.params.lobbyId)
 	}
@@ -216,6 +259,7 @@ class Lobby extends Component {
 													size="big"
 													fluid
 													content="Leave Game"
+													onClick={this.leaveRoom}
 													style={{ backgroundColor: '#3a6bff', color: 'white' }}
 												/>
 											</Grid.Column>

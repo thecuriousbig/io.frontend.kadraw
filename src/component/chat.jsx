@@ -34,7 +34,8 @@ class Chat extends Component {
 		if (this.state.message) {
 			const item = {
 				author: this.state.author,
-				message: this.state.message
+				message: this.state.message,
+				avatar: this.state.avatar
 			}
 			this.messageRef.push(item)
 			this.setState({ message: '' })
@@ -53,7 +54,7 @@ class Chat extends Component {
 				<Grid.Column style={{ maxWidth: '100%' }}>
 					<Segment style={{ minHeight: '20%', maxHeight: '20%', overflow: 'auto' }}>
 						{this.state.list.map((message, index) => (
-							<Message key={index} message={message} author={this.state.author} avatar={this.state.avatar} />
+							<Message key={index} message={message} />
 						))}
 					</Segment>
 					<Input
