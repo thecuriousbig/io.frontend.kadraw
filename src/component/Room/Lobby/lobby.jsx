@@ -53,11 +53,6 @@ class Lobby extends Component {
           }
         })
         const user_score_map = this.state.room.users.reduce((obj, user) => Object.assign(obj, { [user.id]: 0 }), {});
-        // const user_score_map = this.state.room.users.map(user => {
-        //   return {
-        //     [user.id]: { score: 0 }
-        //   }
-        // })
         await this.playRoomRef
           .doc(lobbyId)
           .set({
