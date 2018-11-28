@@ -52,11 +52,12 @@ class Lobby extends Component {
             gameRole: user.role === 'Leader' ? 'drawer' : 'guesser'
           }
         })
-        const user_score_map = this.state.room.users.map(user => {
-          return {
-            [user.id]: { score: 0 }
-          }
-        })
+        const user_score_map = this.state.room.users.reduce((obj, user) => Object.assign(obj, { [user.id]: 0 }), {});
+        // const user_score_map = this.state.room.users.map(user => {
+        //   return {
+        //     [user.id]: { score: 0 }
+        //   }
+        // })
         await this.playRoomRef
           .doc(lobbyId)
           .set({
@@ -67,6 +68,10 @@ class Lobby extends Component {
             vocab: {
               word: '',
               hint: ''
+            },
+            painting: {
+              drawer: {},
+              canvas: []
             }
           })
           .then(() => {
