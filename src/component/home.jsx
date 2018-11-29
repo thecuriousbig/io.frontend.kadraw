@@ -38,6 +38,7 @@ class Home extends Component {
 	}
 
 	handleChange = (event, data) => {
+		console.log('bla : ', event.target.name)
 		if (event.target.name === 'name') {
 			this.setState({ name: event.target.value })
 		} else if (event.target.name === 'lobbyId') {
