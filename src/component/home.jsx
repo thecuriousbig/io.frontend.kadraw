@@ -86,6 +86,7 @@ class Home extends Component {
 
 	joinLobby = async () => {
 		const user = {
+			id: '',
 			name: this.state.name,
 			lobbyId: this.state.lobbyId.toString(),
 			score: this.state.score,
@@ -131,16 +132,17 @@ class Home extends Component {
 							})
 						})
 						.then(() => console.log('add player to lobby complete'), err => console.log('err ', err))
+					user.id = doc.id;
 				},
 				err => {
 					console.log('err ', err)
 				}
 			)
-			const userLocalStorage = { name: user.name, avatar: user.avatar }
-			localStorage.setItem('user', JSON.stringify(userLocalStorage))
+			// const userLocalStorage = { name: user.name, avatar: user.avatar }
+			// localStorage.setItem('user', JSON.stringify(userLocalStorage))
 			this.props.history.push({
 				pathname: `/lobby/${user.lobbyId}`,
-				state: { username: user.name, avatar: user.avatar }
+				state: { user: { id: user.id, name: user.name, avatar: user.avatar } }
 			})
 		}
 	}
@@ -151,6 +153,7 @@ class Home extends Component {
 
 	createLobby = async () => {
 		const user = {
+			id: '',
 			name: this.state.name,
 			lobbyId: await this.generatePin(),
 			score: this.state.score,
@@ -169,6 +172,7 @@ class Home extends Component {
 			.add(user)
 			.then(doc => {
 				lobby.users.push({ id: doc.id, ready: true, role: 'Leader' })
+				user.id = doc.id;
 				console.log(`add user [${doc.id}] complete`)
 			})
 			.catch(err => console.log('err ', err))
@@ -182,9 +186,10 @@ class Home extends Component {
 			.catch(err => console.log('err ', err))
 
 		this.closeModal()
-		const userLocalStorage = { name: user.name, avatar: user.avatar }
-		localStorage.setItem('user', JSON.stringify(userLocalStorage))
-		this.props.history.push({ pathname: `/lobby/${user.lobbyId}`, state: { username: user.name, avatar: user.avatar } })
+		// const userLocalStorage = { name: user.name, avatar: user.avatar }
+		// localStorage.setItem('user', JSON.stringify(userLocalStorage))
+		this.props.history.push({ pathname: `/lobby/${user.lobbyId}`, state: { user: { id: user.id, name: user.name, avatar: user.avatar } } })
+
 	}
 
 	changeAvatar = event => {

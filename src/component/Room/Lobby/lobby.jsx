@@ -8,6 +8,11 @@ class Lobby extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
+			user: {
+				id: '',
+				ready: false,
+				role: ''
+			},
 			room: {
 				users: [],
 				setting: {
@@ -19,7 +24,7 @@ class Lobby extends Component {
 			isAllUserReady: false
 		}
 		this.db = firebase.firestore()
-		this.thisUsername = this.props.location.state.username
+		// this.thisUsername = this.props.location.state.username
 		this.lobbyRef = this.db.collection('Lobby')
 		this.userRef = this.db.collection('User')
 		this.lobbyId = this.props.match.params.lobbyId
@@ -28,7 +33,7 @@ class Lobby extends Component {
 
 	async getRoomInfo(lobbyId) {
 		await this.lobbyRef.doc(lobbyId).onSnapshot(
-			function(snapshot) {
+			function (snapshot) {
 				if (!snapshot.exists) {
 					console.log('No such document!')
 				} else {
@@ -46,7 +51,7 @@ class Lobby extends Component {
 					}
 				}
 			}.bind(this),
-			function(error) {
+			function (error) {
 				console.log('Error getting room', error)
 			}
 		)
@@ -81,6 +86,7 @@ class Lobby extends Component {
 						}
 					})
 					.then(() => {
+						this.props.history.push({ pathname: `/play/${this.lobbyId}`, state: { user: { ...this.props.location.state.user } } })
 						console.log(`create play room success`)
 					})
 					.catch(err => console.log('err ', err))
@@ -112,10 +118,10 @@ class Lobby extends Component {
 
 	leaveRoom = async () => {
 		const leaveuser = await this.userRef
-			.where('name', '==', this.thisUsername)
+			.doc(this.state.user.id)
 			.get()
 			.then(querySnapshot => {
-				return querySnapshot.docs[0]
+				return querySnapshot
 			})
 		const userData = await this.lobbyRef
 			.doc(this.lobbyId)
@@ -143,12 +149,20 @@ class Lobby extends Component {
 		})
 		this.props.history.goBack()
 	}
-
+	componentDidUpdate(prevProps, prevState) {
+		if (this.state.room.users.length > 0) {
+			const currentUser = this.state.room.users.find(user => user.id === this.props.location.state.user.id);
+			if (currentUser && prevState.user && (JSON.stringify(currentUser) !== JSON.stringify(prevState.user))) {
+				this.setState({ user: { ...currentUser } });
+				this.isUserLeader = currentUser.role === 'Leader' ? true : false;
+			}
+		}
+	}
 	componentDidMount() {
 		this.getRoomInfo(this.props.match.params.lobbyId)
 	}
 	componentWillUnmount() {
-		const unsubscribe = this.lobbyRef.onSnapshot(function() {})
+		const unsubscribe = this.lobbyRef.onSnapshot(function () { })
 		unsubscribe()
 	}
 
@@ -164,20 +178,43 @@ class Lobby extends Component {
 	}
 
 	renderStartButton = () => {
-		return <Button size="big" fluid content="Start Game" style={{ backgroundColor: '#3a6bff', color: 'white' }} />
+		return <Button
+			size="big"
+			fluid
+			content="Start Game"
+			disabled={!this.state.isAllUserReady}
+			style={{ backgroundColor: '#3a6bff', color: 'white' }}
+			onClick={this.startGame.bind(this, this.lobbyId)} />
 	}
 
 	renderReadyButton = () => {
-		return <Button size="big" fluid content="Ready" style={{ backgroundColor: '#3a6bff', color: 'white' }} />
+		const readyButton = (
+			<Button
+				size="big"
+				fluid
+				content="Ready"
+				style={{ backgroundColor: '#3a6bff', color: 'white' }}
+				onClick={this.onReady.bind(this, this.state.user.id)} />
+		)
+		const unreadyButton = (
+			<Button
+				size="big"
+				fluid
+				content="Unready"
+				style={{ backgroundColor: 'white', color: '#3a6bff' }}
+				onClick={this.onReady.bind(this, this.state.user.id)} />
+		)
+		return this.state.user.ready ? unreadyButton : readyButton;
 	}
 
 	render() {
 		const users = this.state.room.users
 		const chatProps = {
-			author: this.props.location.state.username,
-			avatar: this.props.location.state.avatar
+			author: this.props.location.state.user.name,
+			avatar: this.props.location.state.user.avatar
 		}
 		const setting = this.state.room.setting
+		let readyOrStartBtn = this.isUserLeader ? this.renderStartButton() : this.renderReadyButton();
 		const { numberOfPlayer, numberOfRound } = setting
 		const isAllUsersReadyString = this.state.isAllUserReady ? 'Yes' : 'No'
 		const roundOptions = [
@@ -239,7 +276,7 @@ class Lobby extends Component {
 								padding: '14px'
 							}}
 						>
-							<Segment style={{}}>
+							<Segment compact style={{}}>
 								<Grid style={{ padding: '8px 16px 8px 16px' }}>
 									<Grid.Row textAlign="center" style={{ padding: '0px' }}>
 										<h1
@@ -288,14 +325,16 @@ class Lobby extends Component {
 												/>
 											</Grid.Column>
 											<Grid.Column width={8} style={{ padding: '0px 0px 0px 8px' }}>
-												<Button
+												{/* {this.isUserLeader ? this.renderStartButton() : this.renderReadyButton()} */}
+												{readyOrStartBtn}
+												{/* <Button
 													size="big"
 													fluid
 													disabled={!this.state.isAllUserReady}
 													content={isAllUsersReadyString === 'Yes' ? 'Start Game' : 'Ready'}
 													style={{ backgroundColor: '#3a6bff', color: 'white' }}
 													onClick={this.startGame.bind(this, this.lobbyId)}
-												/>
+												/> */}
 											</Grid.Column>
 										</Grid>
 									</Grid.Row>
