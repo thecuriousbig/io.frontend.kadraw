@@ -33,7 +33,7 @@ class Lobby extends Component {
 
 	async getRoomInfo(lobbyId) {
 		await this.lobbyRef.doc(lobbyId).onSnapshot(
-			function (snapshot) {
+			async function (snapshot) {
 				if (!snapshot.exists) {
 					console.log('No such document!')
 				} else {
@@ -46,8 +46,26 @@ class Lobby extends Component {
 						this.setState({ room: roomData, isAllUserReady })
 					} else {
 						isAllUserReady = false
-
 						this.setState({ room: roomData, isAllUserReady })
+					}
+					if (roomData.isStart && this.state.user.role !== 'Leader') {
+						const otherUsers = roomData.users.filter(user => user.id !== this.state.user.id);
+						if (otherUsers.length == 0) {
+							await this.lobbyRef
+								.doc(lobbyId)
+								.delete().then(function () {
+									console.log("Document successfully deleted!");
+								}).catch(function (error) {
+									console.error("Error removing document: ", error);
+								});
+						} else {
+							await this.lobbyRef
+								.doc(lobbyId)
+								.update({
+									users: otherUsers
+								});
+						}
+						this.props.history.push({ pathname: `/play/${this.lobbyId}`, state: { user: { ...this.props.location.state.user } } })
 					}
 				}
 			}.bind(this),
@@ -85,7 +103,14 @@ class Lobby extends Component {
 							canvas: []
 						}
 					})
-					.then(() => {
+					.then(async () => {
+						const otherUsers = this.state.room.users.filter(user => user.id !== this.state.user.id);
+						await this.lobbyRef
+							.doc(lobbyId)
+							.update({
+								users: otherUsers,
+								isStart: true
+							})
 						this.props.history.push({ pathname: `/play/${this.lobbyId}`, state: { user: { ...this.props.location.state.user } } })
 						console.log(`create play room success`)
 					})
@@ -303,7 +328,7 @@ class Lobby extends Component {
 												padding: '0px'
 											}}
 										>
-											<UserList users={users} handleReady={this.onReady} />
+											<UserList users={users} userId={this.state.user.id} handleReady={this.onReady} />
 										</Segment>
 									</Grid.Row>
 									<Grid.Row>
