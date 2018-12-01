@@ -191,15 +191,21 @@ class Lobby extends Component {
 		unsubscribe()
 	}
 
-	handleChange = (event, data) => {
-		if (event.target.name === 'roundSetting') {
-			console.log('event;', data.value)
-			this.setState({ room: { setting: { numberOfRound: data.value } } })
-		} else if (event.target.name === 'timerSetting') {
-			console.log('time : ', data.value)
-			this.setState({ room: { setting: { timer: data.value } } })
-		} else {
-		}
+	handleRoundChange = async (event, { value }) => {
+		this.setState({ room: { ...this.state.room, setting: { ...this.state.room.setting, numberOfRound: value } } })
+		await this.lobbyRef
+			.doc(this.lobbyId)
+			.update({
+				'setting.numberOfRound': value
+			})
+	}
+	handleTimerChange = async (event, { value }) => {
+		this.setState({ room: { ...this.state.room, setting: { ...this.state.room.setting, timer: value } } })
+		await this.lobbyRef
+			.doc(this.lobbyId)
+			.update({
+				'setting.timer': value
+			})
 	}
 
 	renderStartButton = () => {
@@ -396,7 +402,8 @@ class Lobby extends Component {
 											options={roundOptions}
 											name="roundSetting"
 											value={this.state.room.setting.numberOfRound}
-											onChange={this.handleChange}
+											onChange={this.handleRoundChange}
+											disabled={this.state.user.role !== 'Leader'}
 										/>
 									</Grid.Column>
 									<Grid.Column textAlign="left">
@@ -404,10 +411,11 @@ class Lobby extends Component {
 										<Dropdown
 											fluid
 											selection
+											value={this.state.room.setting.timer}
 											options={timerOptions}
 											name="timerSetting"
-											value={this.state.room.setting.timer}
-											onChange={this.handleChange}
+											onChange={this.handleTimerChange}
+											disabled={this.state.user.role !== 'Leader'}
 										/>
 									</Grid.Column>
 								</Grid>
