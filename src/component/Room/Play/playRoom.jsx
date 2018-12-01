@@ -126,7 +126,7 @@ class PlayRoom extends Component {
         </Grid>
         <Segment style={{ minHeight: '572px', maxHeight: '572px' }}>
           Round : {this.state.playRoom.currentRound} / {numberOfRound}
-          {/* Timer : {timer} */}
+          Timer : {timer}
           <UserList userId={this.state.user.id} users={this.state.playRoom.users} />
         </Segment>
       </div>
