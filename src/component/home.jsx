@@ -38,7 +38,7 @@ class Home extends Component {
 	}
 
 	handleChange = (event, data) => {
-		console.log('bla : ', event.target.name)
+		console.log('bla : ', event.target)
 		if (event.target.name === 'name') {
 			this.setState({ name: event.target.value })
 		} else if (event.target.name === 'lobbyId') {
@@ -164,7 +164,8 @@ class Home extends Component {
 			users: [],
 			setting: {
 				numberOfPlayer: this.state.dropdownValue,
-				numberOfRound: 5
+				numberOfRound: 5,
+				timer: 60
 			}
 		}
 
