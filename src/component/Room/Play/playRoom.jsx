@@ -13,7 +13,6 @@ import {
   Dropdown,
   Message
 } from 'semantic-ui-react';
-
 class PlayRoom extends Component {
   constructor(props) {
     super(props);
@@ -31,7 +30,12 @@ class PlayRoom extends Component {
           timer: 60
         },
         painting: { canvas: [], drawer: null },
-        user_score_map: {}
+        user_score_map: {},
+        isUserAnswer: {},
+        vocab: {
+          word: '',
+          hint: ''
+        }
       },
       drawer: null,
       guesser: []
@@ -39,6 +43,20 @@ class PlayRoom extends Component {
     this.db = firebase.firestore();
     this.playRoomRef = this.db.collection('PlayRoom');
     this.playRoomId = null;
+    this.intervalHandle = null;
+  }
+  tick = async () => {
+    if (this.state.playRoom.currentTimer === 0) {
+      this.nextRound();
+      clearInterval(this.intervalHandle)
+    } else if (this.state.playRoom.currentTimer > 0) {
+      await this.playRoomRef
+        .doc(this.playRoomId)
+        .update({ currentTimer: this.state.playRoom.currentTimer-- })
+    }
+  }
+  startCountDown = () => {
+    this.intervalHandle = setInterval(this.tick, 1000);
   }
   async getPlayRoomInfo(playRoomId) {
     const getDoc = await this.playRoomRef.doc(playRoomId).onSnapshot(
@@ -81,6 +99,11 @@ class PlayRoom extends Component {
     const currentUser = this.state.playRoom.users.find(user => user.id === this.props.location.state.user.id);
     if (currentUser && prevState.user && (JSON.stringify(prevState.user) !== JSON.stringify(currentUser))) {
       this.setState({ user: currentUser })
+      if (this.state.user.gameRole === 'Drawer') {
+        if (this.state.playRoom.currentTimer !== this.state.playRoom.setting.timer) {
+          this.startCountDown();
+        }
+      }
     }
     if (
       this.state.playRoom.user_score_map !==
@@ -98,10 +121,37 @@ class PlayRoom extends Component {
   async handleCanvasChange(canvas) {
     await this.addCanvas(canvas, this.state.drawer);
   }
+  nextRound = async () => {
+    const nextRound = this.state.playRoom.currentRound + 1;
+    if (nextRound < this.state.playRoom.setting.numberOfRound) {
+      const user_score_map = this.state.playRoom.users.reduce((obj, user) => Object.assign(obj, { [user.id]: this.state.playRoom.user_score_map[user.id] }), {})
+      const is_user_answer_map = this.state.playRoom.users.reduce((obj, user) => Object.assign(obj, { [user.id]: false }), {})
+      await this.playRoomRef
+        .doc(this.playRoomId)
+        .set({
+          currentRound: nextRound,
+          setting: this.state.playRoom.setting,
+          user_score_map,
+          users: this.state.playRoom.users,
+          vocab: {
+            word: '',
+            hint: ''
+          },
+          painting: {
+            drawer: {},
+            canvas: []
+          },
+          currentTimer: this.state.playRoom.setting.timer,
+          isUserAnswer: is_user_answer_map
+        })
+    }
+  }
+  // handleAllCorrect = async ()
   render() {
     const users = this.state.playRoom.users;
     const setting = this.state.playRoom.setting;
-    const { numberOfPlayer, numberOfRound, timer } = setting;
+    const { numberOfPlayer, numberOfRound } = setting;
+    const timer = this.state.playRoom.currentTimer;
     return (
       <div
         style={{
@@ -118,9 +168,15 @@ class PlayRoom extends Component {
           <Grid.Column width={12}>
             <Game
               isDrawer={this.state.user.gameRole === 'Drawer'}
+              playRoomId={this.playRoomId}
+              vocab={this.state.playRoom.vocab}
+              userId={this.state.user.id}
+              isAnswer={this.state.playRoom.isUserAnswer[this.state.user.id]}
               drawer={this.state.drawer}
               onCanvasChange={this.handleCanvasChange.bind(this)}
               newCanvas={this.state.playRoom.painting.canvas}
+              handleAllCorrect={this.nextRound}
+              handleSelectWord={this.startCountDown}
             />
           </Grid.Column>
         </Grid>

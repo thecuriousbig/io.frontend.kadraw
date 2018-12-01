@@ -87,6 +87,7 @@ class Lobby extends Component {
 					}
 				})
 				const user_score_map = this.state.room.users.reduce((obj, user) => Object.assign(obj, { [user.id]: 0 }), {})
+				const is_user_answer_map = this.state.room.users.reduce((obj, user) => Object.assign(obj, { [user.id]: false }), {})
 				await this.playRoomRef
 					.doc(lobbyId)
 					.set({
@@ -101,7 +102,9 @@ class Lobby extends Component {
 						painting: {
 							drawer: {},
 							canvas: []
-						}
+						},
+						currentTimer: this.state.room.setting.timer,
+						isUserAnswer: is_user_answer_map
 					})
 					.then(async () => {
 						const otherUsers = this.state.room.users.filter(user => user.id !== this.state.user.id);
