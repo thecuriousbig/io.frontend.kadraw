@@ -1,6 +1,7 @@
-import React, { Component } from "react";
-import Canvas from "./Game/canvas.jsx";
-import Toolbox from "./Game/toolbox.jsx";
+import React, { Component } from 'react';
+import Canvas from './Game/canvas.jsx';
+import Toolbox from './Game/toolbox.jsx';
+import { Grid, Segment } from 'semantic-ui-react';
 class Game extends Component {
   constructor(props) {
     super(props);
@@ -8,9 +9,9 @@ class Game extends Component {
     this.state = {
       drawer: {
         brush: {
-          size: 0,
-          cap: "round", //butt | square | round
-          color: "#000000" //black
+          size: '3',
+          cap: 'round', //butt | square | round
+          color: '#000000' //black
         }
       }
     };
@@ -58,11 +59,23 @@ class Game extends Component {
   }
 
   render() {
-
-    return (<div>
-      <Canvas drawer={this.props.drawer} newCanvas={this.props.newCanvas} ref={ref => (this.canvas = ref)} brushOptions={this.state.drawer.brush} onCanvasChange={this.handleNewCanvas.bind(this)} />
-      <Toolbox changeBrushColor={this.changeBrushColor.bind(this)} changeBrushSize={this.changeBrushSize.bind(this)} changeBrushCap={this.changeBrushCap.bind(this)} handleClearCanvas={this.handleClearCanvas.bind(this)} />
-    </div>);
+    return (
+      <Segment>
+        <Toolbox
+          changeBrushColor={this.changeBrushColor.bind(this)}
+          changeBrushSize={this.changeBrushSize.bind(this)}
+          changeBrushCap={this.changeBrushCap.bind(this)}
+          handleClearCanvas={this.handleClearCanvas.bind(this)}
+        />
+        <Canvas
+          drawer={this.props.drawer}
+          newCanvas={this.props.newCanvas}
+          ref={ref => (this.canvas = ref)}
+          brushOptions={this.state.drawer.brush}
+          onCanvasChange={this.handleNewCanvas.bind(this)}
+        />
+      </Segment>
+    );
   }
 }
 
