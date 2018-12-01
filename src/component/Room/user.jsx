@@ -11,8 +11,10 @@ class User extends Component {
         <Comment style={{ textAlign: 'left' }}>
           <Comment.Avatar as="a" src={this.props.user.avatar} />
           <Comment.Content>
-            <Comment.Author as="a" style={{ color: 'black', fontSize: '18px' }}>
+            <Comment.Author as="a" style={{ color: this.props.user.id === this.props.userId ? '#3a64ff' : 'black', fontSize: '18px' }}>
               {this.props.user.name}
+              &nbsp;
+              {this.props.user.id === this.props.userId ? '(You)' : ''}
             </Comment.Author>
             <Comment.Metadata>
               <span style={{ color: '#3a64ff' }}>

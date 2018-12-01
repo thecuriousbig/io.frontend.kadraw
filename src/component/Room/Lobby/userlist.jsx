@@ -61,7 +61,7 @@ class UserList extends Component {
           <Comment.Group size="Small">
             <Grid columns={2}>
               <Grid.Column width={10}>
-                <User user={user} key={index} />
+                <User user={user} userId={this.props.userId} key={index} />
               </Grid.Column>
               <Grid.Column textAlign="right" width={6}>
                 {user.role === 'Leader' ? null : readyButton}
