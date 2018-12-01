@@ -16,13 +16,18 @@ class User extends Component {
               &nbsp;
               {this.props.user.id === this.props.userId ? '(You)' : ''}
             </Comment.Author>
-            <Comment.Metadata>
-              <span style={{ color: '#3a64ff' }}>
-                {this.props.user.role === 'Leader'
-                  ? this.props.user.role
-                  : readyState}
-              </span>
-            </Comment.Metadata>
+            {
+              this.props.user.hasOwnProperty('ready') ?
+                <Comment.Metadata>
+                  <span style={{ color: '#3a64ff' }}>
+                    {this.props.user.role === 'Leader'
+                      ? this.props.user.role
+                      : readyState}
+                  </span>
+                </Comment.Metadata>
+                :
+                null
+            }
           </Comment.Content>
         </Comment>
       );
