@@ -54,9 +54,10 @@ class UserList extends Component {
       return this.state.users.map(user => {
         return (
           <Comment.Group size="Small">
-            <User user={user} />
-            <strong>Score : {user.gameScore}</strong>
+            <User userId={this.props.userId} user={user} />
             <strong>{user.gameRole}</strong>
+            &nbsp;
+            <strong>Score : {user.gameScore}</strong>
           </Comment.Group>
         );
       });
