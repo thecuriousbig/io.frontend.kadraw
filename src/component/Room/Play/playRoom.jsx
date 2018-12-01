@@ -18,6 +18,11 @@ class PlayRoom extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      user: {
+        gameRole: '',
+        id: '',
+        role: ''
+      },
       playRoom: {
         users: [],
         setting: {
@@ -37,22 +42,22 @@ class PlayRoom extends Component {
   }
   async getPlayRoomInfo(playRoomId) {
     const getDoc = await this.playRoomRef.doc(playRoomId).onSnapshot(
-      function(snapshot) {
+      function (snapshot) {
         if (!snapshot.exists) {
           console.log('No such document!');
         } else {
           const playRoomData = snapshot.data();
           this.playRoomId = playRoomId;
           const guesser = snapshot.data().users.filter(user => {
-            if (user.gameRole === 'drawer') {
+            if (user.gameRole === 'Drawer') {
               this.setState({ drawer: user });
             }
-            return user.gameRole === 'guesser';
+            return user.gameRole === 'Guesser';
           });
           this.setState({ playRoom: playRoomData, guesser });
         }
       }.bind(this),
-      function(error) {
+      function (error) {
         console.log('Error getting room', error);
       }
     );
@@ -61,7 +66,7 @@ class PlayRoom extends Component {
     this.getPlayRoomInfo(this.props.match.params.playRoomId);
   }
   componentWillUnmount() {
-    const unsubscirbe = this.playRoomRef.onSnapshot(function() {});
+    const unsubscirbe = this.playRoomRef.onSnapshot(function () { });
     unsubscirbe();
   }
   addCanvas(canvas, drawer) {
@@ -73,13 +78,15 @@ class PlayRoom extends Component {
     });
   }
   componentDidUpdate(prevProps, prevState) {
+    const currentUser = this.state.playRoom.users.find(user => user.id === this.props.location.state.user.id);
+    if (currentUser && prevState.user && (JSON.stringify(prevState.user) !== JSON.stringify(currentUser))) {
+      this.setState({ user: currentUser })
+    }
     if (
       this.state.playRoom.user_score_map !==
-        prevState.playRoom.user_score_map &&
+      prevState.playRoom.user_score_map &&
       this.state.playRoom.user_score_map
     ) {
-      console.log('triggered');
-
       const usersWithScore = this.state.playRoom.users.map(user => {
         return { ...user, score: this.state.playRoom.user_score_map[user.id] };
       });
@@ -110,21 +117,21 @@ class PlayRoom extends Component {
         <Grid textAlign="center">
           <Grid.Column width={12}>
             <Game
+              isDrawer={this.state.user.gameRole === 'Drawer'}
               drawer={this.state.drawer}
               onCanvasChange={this.handleCanvasChange.bind(this)}
               newCanvas={this.state.playRoom.painting.canvas}
             />
           </Grid.Column>
         </Grid>
+        <Segment style={{ minHeight: '572px', maxHeight: '572px' }}>
+          Round : {this.state.playRoom.currentRound} / {numberOfRound}
+          {/* Timer : {timer} */}
+          <UserList userId={this.state.user.id} users={this.state.playRoom.users} />
+        </Segment>
       </div>
     );
   }
 }
 
 export default PlayRoom;
-//<Segment style={{ minHeight: '572px', maxHeight: '572px' }}>
-//              Round : {this.state.playRoom.currentRound} / {numberOfRound}
-//              Timer : {timer}
-//              {/* <UserList users={this.state.playRoom.users} /> */}
-//
-//            </Segment>

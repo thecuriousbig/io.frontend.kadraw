@@ -28,7 +28,7 @@ class Game extends Component {
     });
   }
   changeBrushSize(size) {
-    const new_size = this.state.drawer.brush.size + size;
+    const new_size = size;
     const real_size =
       new_size >= 1 && new_size <= 50 ? new_size : new_size > 50 ? 50 : 1;
     this.setState(state => {
@@ -61,13 +61,18 @@ class Game extends Component {
   render() {
     return (
       <Segment>
-        <Toolbox
-          changeBrushColor={this.changeBrushColor.bind(this)}
-          changeBrushSize={this.changeBrushSize.bind(this)}
-          changeBrushCap={this.changeBrushCap.bind(this)}
-          handleClearCanvas={this.handleClearCanvas.bind(this)}
-        />
+        {this.props.isDrawer ?
+          <Toolbox
+            changeBrushColor={this.changeBrushColor.bind(this)}
+            changeBrushSize={this.changeBrushSize.bind(this)}
+            changeBrushCap={this.changeBrushCap.bind(this)}
+            handleClearCanvas={this.handleClearCanvas.bind(this)}
+          /> :
+          <Grid textAlign="center" style={{ height: '150px' }}>
+          </Grid>
+        }
         <Canvas
+          isDrawer={this.props.isDrawer}
           drawer={this.props.drawer}
           newCanvas={this.props.newCanvas}
           ref={ref => (this.canvas = ref)}

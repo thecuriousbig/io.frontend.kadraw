@@ -99,27 +99,37 @@ class Canvas extends Component {
     this.ctx.lineJoin = 'round';
     this.ctx.lineCap = this.state.lineCap;
     this.ctx.lineWidth = this.state.lineWidth;
-    if (
-      this.props.newCanvas !== prevProps &&
-      this.props.newCanvas !== this.line &&
-      this.props.newCanvas &&
-      this.props.newCanvas.length
-    ) {
-      // if (!currentUserId !== this.props.drawer.id) {
-      if (!this.isPainting) {
-        this.props.newCanvas.forEach(paintData => {
-          this.paint(
-            paintData.start,
-            paintData.stop,
-            paintData.strokeStyle,
-            paintData.lineWidth
-          );
-        });
+    if (this.props.newCanvas !== prevProps.newCanvas) {
+      if (!this.props.isDrawer) {
+        if (this.props.newCanvas.length == 0) {
+          this.clearCanvas();
+        } else {
+          this.props.newCanvas.forEach(paintData => {
+            this.paint(
+              paintData.start,
+              paintData.stop,
+              paintData.strokeStyle,
+              paintData.lineWidth
+            );
+          });
+        }
+      } else {
+        if (this.props.newCanvas !== this.line) {
+          this.line = this.props.newCanvas;
+          this.props.newCanvas.forEach(paintData => {
+            this.paint(
+              paintData.start,
+              paintData.stop,
+              paintData.strokeStyle,
+              paintData.lineWidth
+            );
+          });
+        }
       }
     }
   }
   render() {
-    return (
+    const drawerCanvas = (
       <canvas
         ref={ref => (this.canvas = ref)}
         style={{ background: 'white' }}
@@ -128,6 +138,17 @@ class Canvas extends Component {
         onMouseUp={this.endPaintEvent}
         onMouseMove={this.onMouseMove}
       />
+    );
+    const guesserCanvas = (
+      <canvas
+        ref={ref => (this.canvas = ref)}
+        style={{ background: 'white' }}
+      />
+    )
+    return (
+      <div>
+        {this.props.isDrawer ? drawerCanvas : guesserCanvas}
+      </div>
     );
   }
 }

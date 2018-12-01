@@ -83,7 +83,7 @@ class Lobby extends Component {
 						role: user.role,
 						//leader always start as drawer for now
 						//for the sake of development speed
-						gameRole: user.role === 'Leader' ? 'drawer' : 'guesser'
+						gameRole: user.role === 'Leader' ? 'Drawer' : 'Guesser'
 					}
 				})
 				const user_score_map = this.state.room.users.reduce((obj, user) => Object.assign(obj, { [user.id]: 0 }), {})
