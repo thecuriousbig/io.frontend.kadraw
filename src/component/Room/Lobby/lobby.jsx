@@ -143,7 +143,15 @@ class Lobby extends Component {
 			})
 		}
 	}
-
+	onKick = async userId => {
+		if (userId) {
+			await this.lobbyRef
+				.doc(this.lobbyId)
+				.update({
+					users: this.state.room.users.filter(user => user.id !== userId)
+				})
+		}
+	}
 	leaveRoom = async () => {
 		const leaveuser = await this.userRef
 			.doc(this.state.user.id)
@@ -183,6 +191,9 @@ class Lobby extends Component {
 			if (currentUser && prevState.user && (JSON.stringify(currentUser) !== JSON.stringify(prevState.user))) {
 				this.setState({ user: { ...currentUser } });
 				this.isUserLeader = currentUser.role === 'Leader' ? true : false;
+			} else if (!currentUser) {
+				alert('You are no longer in the room!');
+				this.props.history.push('/');
 			}
 		}
 	}
@@ -337,7 +348,7 @@ class Lobby extends Component {
 												padding: '0px'
 											}}
 										>
-											<UserList users={users} userId={this.state.user.id} handleReady={this.onReady} />
+											<UserList users={users} userId={this.state.user.id} handleReady={this.onReady} handleKick={this.onKick} />
 										</Segment>
 									</Grid.Row>
 									<Grid.Row>

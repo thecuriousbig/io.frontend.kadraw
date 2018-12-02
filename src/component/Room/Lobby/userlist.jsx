@@ -48,27 +48,49 @@ class UserList extends Component {
   handleClickReady(userId) {
     this.props.handleReady(userId);
   }
+  handleClickKick(userId) {
+    this.props.handleKick(userId)
+  }
   renderUserElement() {
     if (this.state.users.length > 0) {
+      const isLeader = this.state.users.find(user => user.id === this.props.userId).role === 'Leader';
       return this.state.users.map((user, index) => {
         const readyState = user.ready ? 'ready' : 'not ready';
-        const readyButton = (
-          <Button onClick={this.handleClickReady.bind(this, user.id)}>
-            {user.ready ? 'Unready' : 'Ready'}
+        // const readyButton = (
+        //   <Button onClick={this.props.handleReady.bind(this, user.id)}>
+        //     {user.ready ? 'Unready' : 'Ready'}
+        //   </Button>
+        // );
+        const kickButton = (
+          <Button onClick={this.handleClickKick.bind(this, user.id)}>
+            Kick
           </Button>
         );
-        return (
-          <Comment.Group size="Small">
-            <Grid columns={2}>
-              <Grid.Column width={10}>
-                <User user={user} userId={this.props.userId} key={index} />
-              </Grid.Column>
-              <Grid.Column textAlign="right" width={6}>
-                {user.role === 'Leader' ? null : readyButton}
-              </Grid.Column>
-            </Grid>
-          </Comment.Group>
-        );
+        if (isLeader) {
+          return (
+            <Comment.Group size="Small">
+              <Grid columns={2}>
+                <Grid.Column width={10}>
+                  <User user={user} userId={this.props.userId} key={index} />
+                </Grid.Column>
+                <Grid.Column textAlign="right" width={6}>
+                  {user.role === 'Leader' ? null : kickButton}
+                  {/* {user.role === 'Leader' ? null : readyButton} */}
+                </Grid.Column>
+              </Grid>
+            </Comment.Group>
+          );
+        } else {
+          return (
+            <Comment.Group size="Small">
+              <Grid columns={2}>
+                <Grid.Column width={10}>
+                  <User user={user} userId={this.props.userId} key={index} />
+                </Grid.Column>
+              </Grid>
+            </Comment.Group>
+          );
+        }
       });
     }
     return 'No user';
